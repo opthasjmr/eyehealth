@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { Pill, Plus, Clock, AlertCircle, Trash2 } from 'lucide-react-native';
+import { Pill, Plus, Clock, CircleAlert as AlertCircle, Trash2 } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
