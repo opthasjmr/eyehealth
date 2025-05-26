@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Eye, Activity, Book, Settings } from 'lucide-react-native';
+import { Eye, Activity, Book, Settings, Pill } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -33,6 +33,14 @@ export default function TabLayout() {
           title: 'Exercises',
           tabBarIcon: ({ color, size }) => <Activity size={size} color={color} />,
           headerTitle: 'Eye Exercises',
+        }}
+      />
+      <Tabs.Screen
+        name="medications"
+        options={{
+          title: 'Medicines',
+          tabBarIcon: ({ color, size }) => <Pill size={size} color={color} />,
+          headerTitle: 'Medicine Reminders',
         }}
       />
       <Tabs.Screen
