@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "EXPO_NO_TELEMETRY=1 npx expo start",
     "android": "npx expo start --android",
+    "web": "npx expo start --web",
     "build:android": "npx eas build --platform android",
     "build:web": "npx expo export --platform web",
     "lint": "npx expo lint"
