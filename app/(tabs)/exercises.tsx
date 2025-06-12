@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
-import { Eye, MoveHorizontal, MoveVertical, RotateCcw, Play, Pause, Timer, CheckCircle } from 'lucide-react-native';
+import { Eye, MoveHorizontal, MoveVertical, RotateCcw, Play, Pause, Timer, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { useState, useRef, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/contexts/ThemeContext';
