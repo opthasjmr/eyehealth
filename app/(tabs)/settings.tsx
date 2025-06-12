@@ -1,19 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert } from 'react-native';
-import { 
-  Bell, 
-  Moon, 
-  Eye, 
-  Shield, 
-  Volume2, 
-  Vibrate, 
-  Clock, 
-  Target,
-  Palette,
-  Info,
-  HelpCircle,
-  Mail,
-  Star,
-} from 'lucide-react-native';
+import { Bell, Moon, Eye, Shield, Volume2, Vibrate, Clock, Target, Palette, Info, CircleHelp as HelpCircle, Mail, Star } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useNotifications } from '@/contexts/NotificationContext';

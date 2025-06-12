@@ -9,19 +9,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import {
-  User,
-  Mail,
-  Calendar,
-  Eye,
-  Target,
-  TrendingUp,
-  Settings,
-  LogOut,
-  Edit3,
-  Save,
-  X,
-} from 'lucide-react-native';
+import { User, Mail, Calendar, Eye, Target, TrendingUp, Settings, LogOut, CreditCard as Edit3, Save, X } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { AuthModal } from '@/components/AuthModal';
