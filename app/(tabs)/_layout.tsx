@@ -1,23 +1,28 @@
 import { Tabs } from 'expo-router';
-import { Eye, Activity, Book, Settings, Pill, Target } from 'lucide-react-native';
+import { Eye, Activity, Book, Settings, Pill, Target, User } from 'lucide-react-native';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function TabLayout() {
+  const { theme } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: theme.colors.surface,
           borderTopWidth: 1,
-          borderTopColor: '#E5E5EA',
+          borderTopColor: theme.colors.border,
         },
         headerStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: theme.colors.surface,
         },
         headerTitleStyle: {
           fontFamily: 'Inter-Bold',
+          color: theme.colors.text,
         },
+        headerTintColor: theme.colors.text,
       }}>
       <Tabs.Screen
         name="index"
@@ -57,6 +62,14 @@ export default function TabLayout() {
           title: 'Learn',
           tabBarIcon: ({ color, size }) => <Book size={size} color={color} />,
           headerTitle: 'Eye Education',
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: 'Account',
+          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+          headerTitle: 'My Account',
         }}
       />
       <Tabs.Screen
