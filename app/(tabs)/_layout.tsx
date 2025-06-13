@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Eye, Activity, Book, Settings, Pill, Target, User } from 'lucide-react-native';
+import { Eye, Activity, Book, Settings, Pill, Target, User, Brain, Gamepad2 } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export default function TabLayout() {
@@ -14,6 +14,9 @@ export default function TabLayout() {
           backgroundColor: theme.colors.surface,
           borderTopWidth: 1,
           borderTopColor: theme.colors.border,
+          height: 85,
+          paddingBottom: 8,
+          paddingTop: 8,
         },
         headerStyle: {
           backgroundColor: theme.colors.surface,
@@ -23,13 +26,17 @@ export default function TabLayout() {
           color: theme.colors.text,
         },
         headerTintColor: theme.colors.text,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Eye Care',
+          title: 'Dashboard',
           tabBarIcon: ({ color, size }) => <Eye size={size} color={color} />,
-          headerTitle: 'Eye Health',
+          headerTitle: 'Eye Health Dashboard',
         }}
       />
       <Tabs.Screen
@@ -38,6 +45,22 @@ export default function TabLayout() {
           title: 'Exercises',
           tabBarIcon: ({ color, size }) => <Activity size={size} color={color} />,
           headerTitle: 'Eye Exercises',
+        }}
+      />
+      <Tabs.Screen
+        name="games"
+        options={{
+          title: 'Games',
+          tabBarIcon: ({ color, size }) => <Gamepad2 size={size} color={color} />,
+          headerTitle: 'Eye Health Games',
+        }}
+      />
+      <Tabs.Screen
+        name="ai-screening"
+        options={{
+          title: 'AI Screen',
+          tabBarIcon: ({ color, size }) => <Brain size={size} color={color} />,
+          headerTitle: 'AI Vision Screening',
         }}
       />
       <Tabs.Screen

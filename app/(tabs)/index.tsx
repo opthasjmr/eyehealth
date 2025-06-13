@@ -1,11 +1,18 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { Clock, Sun, Moon, CircleAlert as AlertCircle, Activity, Eye, Bell, TrendingUp } from 'lucide-react-native';
+import { Clock, Sun, Moon, CircleAlert as AlertCircle, Activity, Eye, Bell, TrendingUp, Brain, Gamepad2, Target, Zap } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  withSequence,
+  interpolateColor,
+} from 'react-native-reanimated';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { useNotifications } from '@/contexts/NotificationContext';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -19,6 +26,11 @@ export default function HomeScreen() {
     exercises: 0,
     breaks: 0,
   });
+
+  // Animations
+  const pulseAnimation = useSharedValue(1);
+  const glowAnimation = useSharedValue(0);
+  const progressAnimation = useSharedValue(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -37,6 +49,38 @@ export default function HomeScreen() {
     return () => clearInterval(timer);
   }, [user]);
 
+  useEffect(() => {
+    // Pulse animation for break reminder
+    if (nextBreak <= 60) {
+      pulseAnimation.value = withRepeat(
+        withSequence(
+          withTiming(1.2, { duration: 500 }),
+          withTiming(1, { duration: 500 })
+        ),
+        -1,
+        true
+      );
+    } else {
+      pulseAnimation.value = withTiming(1);
+    }
+
+    // Glow animation for AI features
+    glowAnimation.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 2000 }),
+        withTiming(0, { duration: 2000 })
+      ),
+      -1,
+      true
+    );
+
+    // Progress animation
+    if (user) {
+      const exerciseProgress = (dailyProgress.exercises / user.preferences.dailyGoals.exercises) * 100;
+      progressAnimation.value = withTiming(exerciseProgress, { duration: 1000 });
+    }
+  }, [nextBreak, dailyProgress, user]);
+
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -51,6 +95,19 @@ export default function HomeScreen() {
   const getProgressPercentage = (current: number, goal: number) => {
     return Math.min((current / goal) * 100, 100);
   };
+
+  const pulseAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnimation.value }],
+  }));
+
+  const glowAnimatedStyle = useAnimatedStyle(() => ({
+    shadowOpacity: 0.3 + (glowAnimation.value * 0.4),
+    shadowRadius: 8 + (glowAnimation.value * 8),
+  }));
+
+  const progressAnimatedStyle = useAnimatedStyle(() => ({
+    width: `${progressAnimation.value}%`,
+  }));
 
   const styles = StyleSheet.create({
     container: {
@@ -174,6 +231,76 @@ export default function HomeScreen() {
       fontSize: 14,
       color: theme.colors.textSecondary,
     },
+    aiSection: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 20,
+      padding: 20,
+      marginBottom: 16,
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
+      elevation: 6,
+    },
+    aiHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    aiTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: theme.colors.text,
+      marginLeft: 12,
+    },
+    aiDescription: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginBottom: 16,
+      lineHeight: 20,
+    },
+    aiButton: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: 12,
+      padding: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    aiButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+    featuresGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12,
+    },
+    featureCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      width: (width - 56) / 2,
+      shadowColor: theme.colors.text,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    featureTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginTop: 8,
+      marginBottom: 4,
+    },
+    featureDescription: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      lineHeight: 16,
+    },
     exerciseScroll: {
       marginHorizontal: -16,
       paddingHorizontal: 16,
@@ -253,16 +380,83 @@ export default function HomeScreen() {
             <Text style={styles.statLabel}>Screen Time</Text>
             <Text style={styles.statValue}>{formatTime(screenTime)}</Text>
           </View>
-          <View style={styles.stat}>
-            <Activity size={24} color={theme.colors.warning} />
+          <Animated.View style={[styles.stat, pulseAnimatedStyle]}>
+            <Activity size={24} color={nextBreak <= 60 ? theme.colors.error : theme.colors.warning} />
             <Text style={styles.statLabel}>Next Break</Text>
-            <Text style={styles.statValue}>{formatTime(nextBreak)}</Text>
-          </View>
+            <Text style={[styles.statValue, { color: nextBreak <= 60 ? theme.colors.error : theme.colors.text }]}>
+              {formatTime(nextBreak)}
+            </Text>
+          </Animated.View>
           <View style={styles.stat}>
             <TrendingUp size={24} color={theme.colors.success} />
             <Text style={styles.statLabel}>Streak</Text>
             <Text style={styles.statValue}>{user?.stats.streakDays || 0} days</Text>
           </View>
+        </View>
+      </View>
+
+      {/* AI-Powered Features Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>AI-Powered Features</Text>
+        
+        <Animated.View style={[styles.aiSection, glowAnimatedStyle]}>
+          <View style={styles.aiHeader}>
+            <Brain size={32} color={theme.colors.primary} />
+            <Text style={styles.aiTitle}>AI Vision Screening</Text>
+          </View>
+          <Text style={styles.aiDescription}>
+            Get personalized eye health insights with our advanced AI analysis. Early detection and custom recommendations powered by machine learning.
+          </Text>
+          <TouchableOpacity 
+            style={styles.aiButton} 
+            onPress={() => router.push('/(tabs)/ai-screening')}
+          >
+            <Brain size={20} color="#FFFFFF" />
+            <Text style={styles.aiButtonText}>Start AI Analysis</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        <View style={styles.featuresGrid}>
+          <TouchableOpacity 
+            style={styles.featureCard}
+            onPress={() => router.push('/(tabs)/games')}
+          >
+            <Gamepad2 size={24} color={theme.colors.primary} />
+            <Text style={styles.featureTitle}>Eye Health Games</Text>
+            <Text style={styles.featureDescription}>
+              Interactive games designed to improve focus, tracking, and eye coordination
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.featureCard}
+            onPress={() => router.push('/(tabs)/vision-test')}
+          >
+            <Target size={24} color={theme.colors.primary} />
+            <Text style={styles.featureTitle}>Smart Vision Test</Text>
+            <Text style={styles.featureDescription}>
+              Advanced vision testing with AI-powered result analysis and tracking
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.featureCard}
+            onPress={() => router.push('/(tabs)/exercises')}
+          >
+            <Zap size={24} color={theme.colors.primary} />
+            <Text style={styles.featureTitle}>Adaptive Exercises</Text>
+            <Text style={styles.featureDescription}>
+              Personalized eye exercises that adapt to your progress and needs
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.featureCard}>
+            <Bell size={24} color={theme.colors.primary} />
+            <Text style={styles.featureTitle}>Smart Reminders</Text>
+            <Text style={styles.featureDescription}>
+              AI-optimized break reminders based on your usage patterns
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -278,12 +472,7 @@ export default function HomeScreen() {
               </Text>
             </View>
             <View style={styles.progressBar}>
-              <View 
-                style={[
-                  styles.progressFill, 
-                  { width: `${getProgressPercentage(dailyProgress.exercises, user.preferences.dailyGoals.exercises)}%` }
-                ]} 
-              />
+              <Animated.View style={[styles.progressFill, progressAnimatedStyle]} />
             </View>
             <View style={styles.progressStats}>
               <Text style={styles.progressStatText}>
@@ -335,19 +524,28 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Quick Exercises</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.exerciseScroll}>
-          <TouchableOpacity style={styles.exerciseCard}>
+          <TouchableOpacity 
+            style={styles.exerciseCard}
+            onPress={() => router.push('/(tabs)/exercises')}
+          >
             <Eye size={24} color={theme.colors.primary} />
             <Text style={styles.exerciseTitle}>Focus Shift</Text>
             <Text style={styles.exerciseTime}>2 min</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.exerciseCard}>
+          <TouchableOpacity 
+            style={styles.exerciseCard}
+            onPress={() => router.push('/(tabs)/exercises')}
+          >
             <Activity size={24} color={theme.colors.primary} />
             <Text style={styles.exerciseTitle}>Eye Rolling</Text>
             <Text style={styles.exerciseTime}>1 min</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.exerciseCard}>
-            <Moon size={24} color={theme.colors.primary} />
-            <Text style={styles.exerciseTitle}>Palming</Text>
+          <TouchableOpacity 
+            style={styles.exerciseCard}
+            onPress={() => router.push('/(tabs)/games')}
+          >
+            <Gamepad2 size={24} color={theme.colors.primary} />
+            <Text style={styles.exerciseTitle}>Blink Game</Text>
             <Text style={styles.exerciseTime}>3 min</Text>
           </TouchableOpacity>
         </ScrollView>
