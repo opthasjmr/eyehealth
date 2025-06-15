@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { Clock, Sun, Moon, CircleAlert as AlertCircle, Activity, Eye, Bell, TrendingUp, Brain, Gamepad2, Target, Zap } from 'lucide-react-native';
+import { Clock, Sun, Moon, CircleAlert as AlertCircle, Activity, Eye, Bell, TrendingUp, Brain, Gamepad2, Target, Zap, Search, BookOpen } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import Animated, {
   useSharedValue,
@@ -441,20 +441,23 @@ export default function HomeScreen() {
 
           <TouchableOpacity 
             style={styles.featureCard}
+            onPress={() => router.push('/(tabs)/research')}
+          >
+            <Search size={24} color={theme.colors.primary} />
+            <Text style={styles.featureTitle}>Research Hub</Text>
+            <Text style={styles.featureDescription}>
+              Access latest eye health research and scientific breakthroughs
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.featureCard}
             onPress={() => router.push('/(tabs)/exercises')}
           >
             <Zap size={24} color={theme.colors.primary} />
             <Text style={styles.featureTitle}>Adaptive Exercises</Text>
             <Text style={styles.featureDescription}>
               Personalized eye exercises that adapt to your progress and needs
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.featureCard}>
-            <Bell size={24} color={theme.colors.primary} />
-            <Text style={styles.featureTitle}>Smart Reminders</Text>
-            <Text style={styles.featureDescription}>
-              AI-optimized break reminders based on your usage patterns
             </Text>
           </TouchableOpacity>
         </View>
@@ -522,7 +525,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Quick Exercises</Text>
+        <Text style={styles.sectionTitle}>Quick Access</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.exerciseScroll}>
           <TouchableOpacity 
             style={styles.exerciseCard}
@@ -547,6 +550,14 @@ export default function HomeScreen() {
             <Gamepad2 size={24} color={theme.colors.primary} />
             <Text style={styles.exerciseTitle}>Blink Game</Text>
             <Text style={styles.exerciseTime}>3 min</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.exerciseCard}
+            onPress={() => router.push('/(tabs)/research')}
+          >
+            <BookOpen size={24} color={theme.colors.primary} />
+            <Text style={styles.exerciseTitle}>Latest Research</Text>
+            <Text style={styles.exerciseTime}>Browse</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>

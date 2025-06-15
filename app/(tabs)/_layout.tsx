@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Eye, Activity, Book, Settings, Pill, Target, User, Brain, Gamepad2 } from 'lucide-react-native';
+import { Eye, Activity, Book, Settings, Pill, Target, User, Brain, Gamepad2, Search } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export default function TabLayout() {
@@ -69,6 +69,14 @@ export default function TabLayout() {
           title: 'Vision Test',
           tabBarIcon: ({ color, size }) => <Target size={size} color={color} />,
           headerTitle: 'Vision Test',
+        }}
+      />
+      <Tabs.Screen
+        name="research"
+        options={{
+          title: 'Research',
+          tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
+          headerTitle: 'Research Hub',
         }}
       />
       <Tabs.Screen
