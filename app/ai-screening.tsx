@@ -20,27 +20,7 @@ import Animated, {
   withSequence,
   runOnJS,
 } from 'react-native-reanimated';
-import {
-  Brain,
-  Camera,
-  Eye,
-  Scan,
-  CheckCircle,
-  AlertTriangle,
-  TrendingUp,
-  FileText,
-  Zap,
-  Shield,
-  Target,
-  Activity,
-  Search,
-  Globe,
-  Lightbulb,
-  ArrowLeft,
-  Share,
-  Bookmark,
-  ExternalLink,
-} from 'lucide-react-native';
+import { Brain, Camera, Eye, Scan, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, TrendingUp, FileText, Zap, Shield, Target, Activity, Search, Globe, Lightbulb, ArrowLeft, Share, Bookmark, ExternalLink } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { aiService, AIAnalysisResult, AISearchResult } from '@/services/AIService';
