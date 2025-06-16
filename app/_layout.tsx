@@ -14,7 +14,7 @@ export default function RootLayout() {
       <NotificationProvider>
         <ThemeProvider>
           <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="index" />
             <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style="auto" />

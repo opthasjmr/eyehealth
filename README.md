@@ -1,12 +1,18 @@
-# 👁️ EyeCare Pro
+# 👁️ Vision Care Plus
 
 **Advanced AI-Powered Eye Health Management Platform**
 
 A cutting-edge mobile and web application that combines artificial intelligence, gamification, and modern design to revolutionize eye health care. Built with React Native, Expo, and powered by advanced AI algorithms for personalized vision screening and treatment recommendations.
 
-![EyeCare Pro Banner](https://images.pexels.com/photos/5752242/pexels-photo-5752242.jpeg?auto=compress&cs=tinysrgb&w=1200&h=400&fit=crop)
+![Vision Care Plus Banner](https://images.pexels.com/photos/5752242/pexels-photo-5752242.jpeg?auto=compress&cs=tinysrgb&w=1200&h=400&fit=crop)
 
 ## 🌟 Features
+
+### 🎨 Modern Sidebar Navigation
+- **Intuitive Interface**: Clean sidebar navigation with smooth animations
+- **Quick Access**: Easy navigation between all app sections
+- **Responsive Design**: Optimized for both mobile and desktop experiences
+- **Visual Feedback**: Active states and hover effects for better UX
 
 ### 🤖 AI-Powered Vision Screening
 - **Automated Analysis**: Advanced AI algorithms analyze pupil response, blink patterns, and eye tracking
@@ -15,12 +21,19 @@ A cutting-edge mobile and web application that combines artificial intelligence,
 - **Personalized Recommendations**: AI-generated treatment plans based on individual needs
 - **Progress Tracking**: Historical data analysis with trend identification
 
-### 🎮 Interactive Eye Health Games
+### 🎮 Interactive Vision Games
 - **Blink Training Game**: Improves tear distribution and reduces dry eye symptoms
 - **Focus Training Game**: Enhances visual tracking and eye coordination
 - **Color Recognition Game**: Boosts visual processing speed and reaction time
 - **Achievement System**: Unlockable badges and progress milestones
 - **Adaptive Difficulty**: Games adjust to user performance and improvement
+
+### 📚 Learn & Research Hub
+- **Educational Content**: Curated articles on eye health and vision care
+- **Research Access**: Latest scientific papers and studies
+- **Interactive Guides**: Step-by-step tutorials for eye exercises
+- **Expert Insights**: Tips and recommendations from eye care professionals
+- **Trending Topics**: Stay updated with the latest in vision science
 
 ### 📊 Smart Health Dashboard
 - **Real-time Monitoring**: Live screen time tracking and break reminders
@@ -41,12 +54,6 @@ A cutting-edge mobile and web application that combines artificial intelligence,
 - **Dosage Tracking**: Monitor medication adherence and timing
 - **Notes & Instructions**: Detailed medication information and care notes
 - **History Tracking**: Complete medication history and compliance reports
-
-### 📚 Educational Resources
-- **Expert Articles**: Curated content on eye health and vision care
-- **Interactive Guides**: Step-by-step tutorials for eye exercises
-- **Tips & Recommendations**: Daily eye health tips and best practices
-- **Research Updates**: Latest findings in vision science and eye care
 
 ## 🚀 Technology Stack
 
@@ -86,8 +93,8 @@ A cutting-edge mobile and web application that combines artificial intelligence,
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/eyecare-pro.git
-   cd eyecare-pro
+   git clone https://github.com/your-username/vision-care-plus.git
+   cd vision-care-plus
    ```
 
 2. **Install dependencies**
@@ -133,11 +140,27 @@ npm run build:android
 
 ### Getting Started
 
-1. **Create Account**: Sign up with email or use guest mode
-2. **Complete Profile**: Add age, eye conditions, and preferences
-3. **Take AI Screening**: Complete initial vision assessment
-4. **Set Goals**: Configure daily exercise and break targets
-5. **Start Training**: Begin with recommended eye exercises
+1. **Launch App**: Open Vision Care Plus in your browser or mobile device
+2. **Navigate**: Use the sidebar menu to explore different sections
+3. **Create Account**: Sign up to save your progress and preferences
+4. **Complete Profile**: Add age, eye conditions, and preferences
+5. **Take AI Screening**: Complete initial vision assessment
+6. **Set Goals**: Configure daily exercise and break targets
+7. **Start Training**: Begin with recommended eye exercises
+
+### Navigation
+
+The app features a modern sidebar navigation system:
+
+- **Dashboard**: Overview of your eye health progress
+- **Eye Exercises**: Guided exercise routines
+- **Vision Games**: Interactive training games
+- **AI Screening**: Advanced vision analysis
+- **Vision Test**: Comprehensive eye testing
+- **Learn & Research**: Educational content and research
+- **Medications**: Medication reminders and tracking
+- **My Account**: User profile and statistics
+- **Settings**: App preferences and configuration
 
 ### AI Vision Screening
 
@@ -153,30 +176,15 @@ npm run build:android
 
 4. **Track Progress**: Monitor improvements over time with historical data
 
-### Eye Health Games
+### Learn & Research Hub
 
-#### Blink Training Game
-- **Objective**: Achieve target blink count in 30 seconds
-- **Benefits**: Improves tear distribution, reduces dry eyes
-- **Scoring**: Accuracy-based scoring system
+The Learn & Research section combines educational content with access to the latest research:
 
-#### Focus Training Game
-- **Objective**: Follow numbered targets in sequence
-- **Benefits**: Enhances eye coordination and tracking
-- **Difficulty**: Adaptive speed and complexity
-
-#### Color Recognition Game
-- **Objective**: Identify displayed colors quickly and accurately
-- **Benefits**: Improves visual processing and reaction time
-- **Progression**: Increasing speed and color complexity
-
-### Daily Routine
-
-1. **Morning Check-in**: Review daily goals and schedule
-2. **Regular Breaks**: Follow 20-20-20 rule reminders
-3. **Exercise Sessions**: Complete recommended eye exercises
-4. **Gaming Sessions**: Play eye health games for engagement
-5. **Evening Review**: Check progress and plan next day
+- **Educational Articles**: Expert-curated content on eye health
+- **Research Papers**: Access to scientific studies and publications
+- **Interactive Tutorials**: Step-by-step guides for eye care
+- **Trending Topics**: Latest developments in vision science
+- **Personalized Recommendations**: Content tailored to your interests
 
 ## 🔧 Configuration
 
@@ -185,8 +193,8 @@ npm run build:android
 Create a `.env` file in the root directory:
 
 ```env
-EXPO_PUBLIC_API_URL=https://api.eyecarepro.com
-EXPO_PUBLIC_AI_SERVICE_URL=https://ai.eyecarepro.com
+EXPO_PUBLIC_API_URL=https://api.visioncareplus.com
+EXPO_PUBLIC_AI_SERVICE_URL=https://ai.visioncareplus.com
 EXPO_PUBLIC_ANALYTICS_KEY=your_analytics_key
 ```
 
@@ -204,17 +212,13 @@ const customTheme = {
 };
 ```
 
-#### AI Model Settings
+#### Sidebar Configuration
 ```typescript
-// Configure AI analysis parameters
-const aiConfig = {
-  confidenceThreshold: 0.85,
-  riskLevels: {
-    low: { min: 80, max: 100 },
-    medium: { min: 60, max: 79 },
-    high: { min: 0, max: 59 }
-  }
-};
+// Customize sidebar items
+const sidebarItems = [
+  { id: 'dashboard', title: 'Dashboard', icon: Home, screen: 'dashboard' },
+  // ... other items
+];
 ```
 
 ## 🧪 Testing
@@ -282,14 +286,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Deployment Guide](docs/deployment.md)
 
 ### Community
-- [Discord Community](https://discord.gg/eyecarepro)
-- [GitHub Discussions](https://github.com/your-username/eyecare-pro/discussions)
-- [Stack Overflow](https://stackoverflow.com/questions/tagged/eyecare-pro)
+- [Discord Community](https://discord.gg/visioncareplus)
+- [GitHub Discussions](https://github.com/your-username/vision-care-plus/discussions)
+- [Stack Overflow](https://stackoverflow.com/questions/tagged/vision-care-plus)
 
 ### Contact
-- Email: support@eyecarepro.com
-- Website: [www.eyecarepro.com](https://www.eyecarepro.com)
-- Twitter: [@EyeCarePro](https://twitter.com/eyecarepro)
+- Email: support@visioncareplus.com
+- Website: [www.visioncareplus.com](https://www.visioncareplus.com)
+- Twitter: [@VisionCarePlus](https://twitter.com/visioncareplus)
 
 ## 🗺️ Roadmap
 
@@ -332,6 +336,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ for better eye health**
 
-[Website](https://eyecarepro.com) • [Download](https://apps.apple.com/eyecarepro) • [Support](mailto:support@eyecarepro.com)
+[Website](https://visioncareplus.com) • [Download](https://apps.apple.com/visioncareplus) • [Support](mailto:support@visioncareplus.com)
 
 </div>

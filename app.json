@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "EyeCare Pro",
-    "slug": "eyecare-pro",
+    "name": "Vision Care Plus",
+    "slug": "vision-care-plus",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "eyecarepro",
+    "scheme": "visioncareplus",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -18,14 +18,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.eyecarepro.app"
+      "bundleIdentifier": "com.visioncareplus.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.eyecarepro.app",
+      "package": "com.visioncareplus.app",
       "permissions": [
         "CAMERA",
         "VIBRATE",
@@ -47,6 +47,9 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "web": {
+      "output": "static"
     }
   }
 }
