@@ -7,6 +7,7 @@ import {
   Dimensions,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -28,7 +29,21 @@ import {
   Pause,
   RotateCcw,
   Award,
-  TrendingUp
+  TrendingUp,
+  Search,
+  Palette,
+  Focus,
+  Brain,
+  Timer,
+  CheckCircle,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ArrowDown,
+  Circle,
+  Square,
+  Triangle,
+  Hexagon,
 } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
@@ -42,6 +57,17 @@ interface GameStats {
   bestScore: number;
   streakDays: number;
   achievements: string[];
+}
+
+interface Game {
+  id: string;
+  title: string;
+  description: string;
+  icon: any;
+  difficulty: 'easy' | 'medium' | 'hard';
+  category: 'perception' | 'tracking' | 'memory' | 'coordination';
+  benefits: string[];
+  estimatedTime: number;
 }
 
 interface BlinkGameState {
@@ -67,7 +93,90 @@ interface ColorGameState {
   score: number;
   timeLeft: number;
   correctAnswer: string;
+  round: number;
 }
+
+interface MemoryGameState {
+  isActive: boolean;
+  sequence: number[];
+  userSequence: number[];
+  currentStep: number;
+  score: number;
+  showingSequence: boolean;
+  gamePhase: 'showing' | 'input' | 'feedback';
+}
+
+interface TrackingGameState {
+  isActive: boolean;
+  ballPosition: { x: number; y: number };
+  score: number;
+  timeLeft: number;
+  speed: number;
+  direction: { x: number; y: number };
+}
+
+const games: Game[] = [
+  {
+    id: 'blink-training',
+    title: 'Blink Training',
+    description: 'Practice healthy blinking patterns to reduce eye strain and improve tear distribution',
+    icon: Eye,
+    difficulty: 'easy',
+    category: 'coordination',
+    benefits: ['Reduces dry eyes', 'Improves tear film quality', 'Prevents eye strain'],
+    estimatedTime: 120,
+  },
+  {
+    id: 'focus-tracking',
+    title: 'Focus Tracking',
+    description: 'Follow moving targets to improve visual tracking and focus abilities',
+    icon: Target,
+    difficulty: 'medium',
+    category: 'tracking',
+    benefits: ['Enhances eye coordination', 'Improves visual tracking', 'Strengthens focus muscles'],
+    estimatedTime: 180,
+  },
+  {
+    id: 'color-perception',
+    title: 'Color Perception',
+    description: 'Test and improve color recognition and visual processing speed',
+    icon: Palette,
+    difficulty: 'medium',
+    category: 'perception',
+    benefits: ['Improves color perception', 'Enhances visual processing', 'Boosts reaction time'],
+    estimatedTime: 150,
+  },
+  {
+    id: 'visual-memory',
+    title: 'Visual Memory',
+    description: 'Remember and repeat sequences to enhance visual memory and attention',
+    icon: Brain,
+    difficulty: 'hard',
+    category: 'memory',
+    benefits: ['Improves visual memory', 'Enhances attention span', 'Boosts concentration'],
+    estimatedTime: 240,
+  },
+  {
+    id: 'spot-difference',
+    title: 'Spot the Difference',
+    description: 'Find subtle differences between images to sharpen visual discrimination',
+    icon: Search,
+    difficulty: 'medium',
+    category: 'perception',
+    benefits: ['Sharpens visual discrimination', 'Improves attention to detail', 'Enhances focus'],
+    estimatedTime: 300,
+  },
+  {
+    id: 'ball-tracking',
+    title: 'Ball Tracking',
+    description: 'Follow a moving ball with your eyes to improve smooth pursuit movements',
+    icon: Circle,
+    difficulty: 'easy',
+    category: 'tracking',
+    benefits: ['Improves smooth pursuit', 'Enhances eye movement control', 'Reduces tracking errors'],
+    estimatedTime: 120,
+  },
+];
 
 export default function GamesScreen() {
   const { theme } = useTheme();
@@ -81,7 +190,7 @@ export default function GamesScreen() {
     achievements: [],
   });
 
-  // Blink Game State
+  // Game States
   const [blinkGame, setBlinkGame] = useState<BlinkGameState>({
     isActive: false,
     blinkCount: 0,
@@ -90,7 +199,6 @@ export default function GamesScreen() {
     score: 0,
   });
 
-  // Focus Game State
   const [focusGame, setFocusGame] = useState<FocusGameState>({
     isActive: false,
     currentTarget: 0,
@@ -99,7 +207,6 @@ export default function GamesScreen() {
     targets: [],
   });
 
-  // Color Game State
   const [colorGame, setColorGame] = useState<ColorGameState>({
     isActive: false,
     currentColor: '',
@@ -107,12 +214,32 @@ export default function GamesScreen() {
     score: 0,
     timeLeft: 45,
     correctAnswer: '',
+    round: 1,
+  });
+
+  const [memoryGame, setMemoryGame] = useState<MemoryGameState>({
+    isActive: false,
+    sequence: [],
+    userSequence: [],
+    currentStep: 0,
+    score: 0,
+    showingSequence: false,
+    gamePhase: 'showing',
+  });
+
+  const [trackingGame, setTrackingGame] = useState<TrackingGameState>({
+    isActive: false,
+    ballPosition: { x: width / 2, y: height / 2 },
+    score: 0,
+    timeLeft: 60,
+    speed: 2,
+    direction: { x: 1, y: 1 },
   });
 
   // Animations
   const blinkAnimation = useSharedValue(1);
   const targetAnimation = useSharedValue(0);
-  const scoreAnimation = useSharedValue(0);
+  const ballAnimation = useSharedValue({ x: width / 2, y: height / 2 });
 
   useEffect(() => {
     loadGameStats();
@@ -146,7 +273,6 @@ export default function GamesScreen() {
       bestScore: Math.max(gameStats.bestScore, score),
     };
 
-    // Check for achievements
     const newAchievements = [...gameStats.achievements];
     if (gameStats.gamesPlayed === 0) newAchievements.push('First Game');
     if (score > 100 && !newAchievements.includes('High Scorer')) newAchievements.push('High Scorer');
@@ -215,12 +341,12 @@ export default function GamesScreen() {
 
   // Focus Game Logic
   const startFocusGame = () => {
-    const newTargets = Array.from({ length: 5 }, (_, i) => ({
+    const newTargets = Array.from({ length: 6 }, (_, i) => ({
       id: i,
-      x: Math.random() * (width - 60),
-      y: Math.random() * (height - 200) + 100,
-      color: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'][Math.floor(Math.random() * 5)],
-      size: 40 + Math.random() * 20,
+      x: Math.random() * (width - 80) + 40,
+      y: Math.random() * (height - 300) + 150,
+      color: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'][i],
+      size: 50,
     }));
 
     setFocusGame({
@@ -282,6 +408,8 @@ export default function GamesScreen() {
     { name: 'Yellow', value: '#FFEAA7' },
     { name: 'Purple', value: '#A29BFE' },
     { name: 'Orange', value: '#FD79A8' },
+    { name: 'Pink', value: '#FDCB6E' },
+    { name: 'Teal', value: '#00B894' },
   ];
 
   const startColorGame = () => {
@@ -289,7 +417,7 @@ export default function GamesScreen() {
     const wrongColors = colors.filter(c => c.name !== correctColor.name);
     const shuffledOptions = [
       correctColor.name,
-      ...wrongColors.slice(0, 2).map(c => c.name)
+      ...wrongColors.slice(0, 3).map(c => c.name)
     ].sort(() => Math.random() - 0.5);
 
     setColorGame({
@@ -299,6 +427,7 @@ export default function GamesScreen() {
       score: 0,
       timeLeft: 45,
       correctAnswer: correctColor.name,
+      round: 1,
     });
 
     const timer = setInterval(() => {
@@ -318,12 +447,11 @@ export default function GamesScreen() {
       const isCorrect = answer === prev.correctAnswer;
       const newScore = isCorrect ? prev.score + 10 : prev.score;
       
-      // Generate new question
       const correctColor = colors[Math.floor(Math.random() * colors.length)];
       const wrongColors = colors.filter(c => c.name !== correctColor.name);
       const shuffledOptions = [
         correctColor.name,
-        ...wrongColors.slice(0, 2).map(c => c.name)
+        ...wrongColors.slice(0, 3).map(c => c.name)
       ].sort(() => Math.random() - 0.5);
 
       return {
@@ -332,6 +460,7 @@ export default function GamesScreen() {
         currentColor: correctColor.value,
         options: shuffledOptions,
         correctAnswer: correctColor.name,
+        round: prev.round + 1,
       };
     });
   };
@@ -341,9 +470,109 @@ export default function GamesScreen() {
     
     Alert.alert(
       'Color Recognition Complete!',
-      `Final Score: ${finalScore}`,
+      `Final Score: ${finalScore}\nRounds Completed: ${colorGame.round - 1}`,
       [{ text: 'Play Again', onPress: () => setSelectedGame(null) }]
     );
+  };
+
+  // Memory Game Logic
+  const startMemoryGame = () => {
+    const initialSequence = [Math.floor(Math.random() * 4)];
+    setMemoryGame({
+      isActive: true,
+      sequence: initialSequence,
+      userSequence: [],
+      currentStep: 0,
+      score: 0,
+      showingSequence: true,
+      gamePhase: 'showing',
+    });
+
+    showSequence(initialSequence);
+  };
+
+  const showSequence = (sequence: number[]) => {
+    setMemoryGame(prev => ({ ...prev, gamePhase: 'showing', showingSequence: true }));
+    
+    sequence.forEach((step, index) => {
+      setTimeout(() => {
+        // Highlight the step
+        setTimeout(() => {
+          if (index === sequence.length - 1) {
+            setMemoryGame(prev => ({ 
+              ...prev, 
+              gamePhase: 'input', 
+              showingSequence: false,
+              userSequence: [],
+              currentStep: 0,
+            }));
+          }
+        }, 500);
+      }, index * 1000);
+    });
+  };
+
+  const handleMemoryInput = (input: number) => {
+    setMemoryGame(prev => {
+      const newUserSequence = [...prev.userSequence, input];
+      const currentIndex = prev.currentStep;
+      
+      if (input === prev.sequence[currentIndex]) {
+        if (newUserSequence.length === prev.sequence.length) {
+          // Sequence complete, add new step
+          const newSequence = [...prev.sequence, Math.floor(Math.random() * 4)];
+          const newScore = prev.score + prev.sequence.length * 10;
+          
+          setTimeout(() => showSequence(newSequence), 1000);
+          
+          return {
+            ...prev,
+            sequence: newSequence,
+            score: newScore,
+            gamePhase: 'feedback',
+          };
+        } else {
+          return {
+            ...prev,
+            userSequence: newUserSequence,
+            currentStep: currentIndex + 1,
+          };
+        }
+      } else {
+        // Wrong input, end game
+        setTimeout(() => endMemoryGame(prev.score), 1000);
+        return { ...prev, gamePhase: 'feedback' };
+      }
+    });
+  };
+
+  const endMemoryGame = async (finalScore: number) => {
+    await updateGameStats(finalScore);
+    
+    Alert.alert(
+      'Memory Game Complete!',
+      `Final Score: ${finalScore}\nSequence Length: ${memoryGame.sequence.length}`,
+      [{ text: 'Play Again', onPress: () => setSelectedGame(null) }]
+    );
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy': return theme.colors.success;
+      case 'medium': return theme.colors.warning;
+      case 'hard': return theme.colors.error;
+      default: return theme.colors.primary;
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'perception': return theme.colors.primary;
+      case 'tracking': return theme.colors.accent;
+      case 'memory': return theme.colors.warning;
+      case 'coordination': return theme.colors.success;
+      default: return theme.colors.textSecondary;
+    }
   };
 
   const blinkAnimatedStyle = useAnimatedStyle(() => ({
@@ -427,6 +656,41 @@ export default function GamesScreen() {
       color: theme.colors.textSecondary,
       marginBottom: 16,
       lineHeight: 20,
+    },
+    gameMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+      gap: 12,
+    },
+    metaItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    metaText: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginLeft: 4,
+    },
+    difficultyBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 12,
+    },
+    difficultyText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: '#FFFFFF',
+    },
+    categoryBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 12,
+    },
+    categoryText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: '#FFFFFF',
     },
     gameBenefits: {
       marginBottom: 16,
@@ -560,12 +824,46 @@ export default function GamesScreen() {
       fontWeight: '600',
       color: theme.colors.text,
     },
+    memoryGameArea: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+    memoryGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 16,
+    },
+    memoryButton: {
+      width: 80,
+      height: 80,
+      borderRadius: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.surface,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+    },
+    memoryButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    memoryButtonText: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: theme.colors.text,
+    },
+    memoryButtonTextActive: {
+      color: '#FFFFFF',
+    },
     backButton: {
       backgroundColor: theme.colors.textSecondary,
       borderRadius: 12,
-      padding: 12,
+      padding: 16,
       alignItems: 'center',
-      marginTop: 20,
+      margin: 20,
     },
     backButtonText: {
       color: '#FFFFFF',
@@ -597,7 +895,8 @@ export default function GamesScreen() {
     },
   });
 
-  if (selectedGame === 'blink') {
+  // Game Screens
+  if (selectedGame === 'blink-training') {
     return (
       <View style={styles.container}>
         <View style={styles.gameInfo}>
@@ -633,7 +932,7 @@ export default function GamesScreen() {
     );
   }
 
-  if (selectedGame === 'focus') {
+  if (selectedGame === 'focus-tracking') {
     return (
       <View style={styles.container}>
         <View style={styles.gameInfo}>
@@ -686,10 +985,11 @@ export default function GamesScreen() {
     );
   }
 
-  if (selectedGame === 'color') {
+  if (selectedGame === 'color-perception') {
     return (
       <View style={styles.container}>
         <View style={styles.gameInfo}>
+          <Text style={styles.gameInfoText}>Round: {colorGame.round}</Text>
           <Text style={styles.gameInfoText}>Time: {colorGame.timeLeft}s</Text>
           <Text style={styles.gameInfoText}>Score: {colorGame.score}</Text>
         </View>
@@ -725,12 +1025,59 @@ export default function GamesScreen() {
     );
   }
 
+  if (selectedGame === 'visual-memory') {
+    return (
+      <View style={styles.container}>
+        <View style={styles.gameInfo}>
+          <Text style={styles.gameInfoText}>Sequence: {memoryGame.sequence.length}</Text>
+          <Text style={styles.gameInfoText}>Phase: {memoryGame.gamePhase}</Text>
+          <Text style={styles.gameInfoText}>Score: {memoryGame.score}</Text>
+        </View>
+
+        <View style={styles.memoryGameArea}>
+          <View style={styles.memoryGrid}>
+            {[0, 1, 2, 3].map((index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.memoryButton,
+                  memoryGame.showingSequence && memoryGame.sequence[memoryGame.currentStep] === index && styles.memoryButtonActive,
+                ]}
+                onPress={() => handleMemoryInput(index)}
+                disabled={memoryGame.gamePhase !== 'input'}
+              >
+                <Text style={[
+                  styles.memoryButtonText,
+                  memoryGame.showingSequence && memoryGame.sequence[memoryGame.currentStep] === index && styles.memoryButtonTextActive,
+                ]}>
+                  {index + 1}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {!memoryGame.isActive && (
+          <TouchableOpacity style={styles.playButton} onPress={startMemoryGame}>
+            <Play size={20} color="#FFFFFF" />
+            <Text style={styles.playButtonText}>Start Memory Game</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity style={styles.backButton} onPress={() => setSelectedGame(null)}>
+          <Text style={styles.backButtonText}>Back to Games</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Main Games List
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Eye Health Games</Text>
+        <Text style={styles.headerTitle}>Vision Games</Text>
         <Text style={styles.subtitle}>
-          Fun and engaging games to improve your eye health and vision
+          Interactive games designed to improve eye health and visual skills
         </Text>
         
         <View style={styles.statsContainer}>
@@ -753,89 +1100,43 @@ export default function GamesScreen() {
       </View>
 
       <View style={styles.gamesGrid}>
-        <View style={styles.gameCard}>
-          <View style={styles.gameHeader}>
-            <Eye size={32} color={theme.colors.primary} style={styles.gameIcon} />
-            <Text style={styles.gameTitle}>Blink Training</Text>
+        {games.map((game) => (
+          <View key={game.id} style={styles.gameCard}>
+            <View style={styles.gameHeader}>
+              <game.icon size={32} color={theme.colors.primary} style={styles.gameIcon} />
+              <Text style={styles.gameTitle}>{game.title}</Text>
+            </View>
+            
+            <Text style={styles.gameDescription}>{game.description}</Text>
+            
+            <View style={styles.gameMeta}>
+              <View style={styles.metaItem}>
+                <Timer size={12} color={theme.colors.textSecondary} />
+                <Text style={styles.metaText}>{Math.floor(game.estimatedTime / 60)}m</Text>
+              </View>
+              <View style={[styles.difficultyBadge, { backgroundColor: getDifficultyColor(game.difficulty) }]}>
+                <Text style={styles.difficultyText}>{game.difficulty.toUpperCase()}</Text>
+              </View>
+              <View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(game.category) }]}>
+                <Text style={styles.categoryText}>{game.category.toUpperCase()}</Text>
+              </View>
+            </View>
+            
+            <View style={styles.gameBenefits}>
+              {game.benefits.map((benefit, index) => (
+                <View key={index} style={styles.benefitItem}>
+                  <Star size={12} color={theme.colors.success} />
+                  <Text style={styles.benefitText}>{benefit}</Text>
+                </View>
+              ))}
+            </View>
+            
+            <TouchableOpacity style={styles.playButton} onPress={() => setSelectedGame(game.id)}>
+              <Play size={20} color="#FFFFFF" />
+              <Text style={styles.playButtonText}>Play Game</Text>
+            </TouchableOpacity>
           </View>
-          <Text style={styles.gameDescription}>
-            Practice healthy blinking patterns to reduce eye strain and improve tear distribution.
-          </Text>
-          <View style={styles.gameBenefits}>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Reduces dry eyes</Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Improves tear film quality</Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Prevents eye strain</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.playButton} onPress={() => setSelectedGame('blink')}>
-            <Play size={20} color="#FFFFFF" />
-            <Text style={styles.playButtonText}>Play Blink Game</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.gameCard}>
-          <View style={styles.gameHeader}>
-            <Target size={32} color={theme.colors.primary} style={styles.gameIcon} />
-            <Text style={styles.gameTitle}>Focus Training</Text>
-          </View>
-          <Text style={styles.gameDescription}>
-            Improve your visual tracking and focus abilities by following moving targets in sequence.
-          </Text>
-          <View style={styles.gameBenefits}>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Enhances eye coordination</Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Improves visual tracking</Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Strengthens focus muscles</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.playButton} onPress={() => setSelectedGame('focus')}>
-            <Play size={20} color="#FFFFFF" />
-            <Text style={styles.playButtonText}>Play Focus Game</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.gameCard}>
-          <View style={styles.gameHeader}>
-            <Zap size={32} color={theme.colors.primary} style={styles.gameIcon} />
-            <Text style={styles.gameTitle}>Color Recognition</Text>
-          </View>
-          <Text style={styles.gameDescription}>
-            Test and improve your color perception and visual processing speed.
-          </Text>
-          <View style={styles.gameBenefits}>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Improves color perception</Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Enhances visual processing</Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Star size={12} color={theme.colors.success} />
-              <Text style={styles.benefitText}>Boosts reaction time</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.playButton} onPress={() => setSelectedGame('color')}>
-            <Play size={20} color="#FFFFFF" />
-            <Text style={styles.playButtonText}>Play Color Game</Text>
-          </TouchableOpacity>
-        </View>
+        ))}
       </View>
 
       {gameStats.achievements.length > 0 && (

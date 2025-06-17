@@ -370,7 +370,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Eye Health Dashboard</Text>
+        <Text style={styles.headerTitle}>Vision Care Plus</Text>
         {user && (
           <Text style={styles.welcomeText}>Welcome back, {user.name}!</Text>
         )}
@@ -405,7 +405,7 @@ export default function HomeScreen() {
             <Text style={styles.aiTitle}>AI Vision Screening</Text>
           </View>
           <Text style={styles.aiDescription}>
-            Get personalized eye health insights with our advanced AI analysis. Early detection and custom recommendations powered by machine learning.
+            Get personalized eye health insights with our advanced AI analysis. Early detection and custom recommendations powered by machine learning with internet access.
           </Text>
           <TouchableOpacity 
             style={styles.aiButton} 
@@ -422,9 +422,9 @@ export default function HomeScreen() {
             onPress={() => router.push('/(tabs)/games')}
           >
             <Gamepad2 size={24} color={theme.colors.primary} />
-            <Text style={styles.featureTitle}>Eye Health Games</Text>
+            <Text style={styles.featureTitle}>Vision Games</Text>
             <Text style={styles.featureDescription}>
-              Interactive games designed to improve focus, tracking, and eye coordination
+              Interactive games for blink training, focus tracking, color perception, and visual memory
             </Text>
           </TouchableOpacity>
 
@@ -446,7 +446,7 @@ export default function HomeScreen() {
             <Search size={24} color={theme.colors.primary} />
             <Text style={styles.featureTitle}>Research Hub</Text>
             <Text style={styles.featureDescription}>
-              Access latest eye health research and scientific breakthroughs
+              Access latest eye health research with AI-powered search and insights
             </Text>
           </TouchableOpacity>
 
@@ -455,9 +455,9 @@ export default function HomeScreen() {
             onPress={() => router.push('/(tabs)/exercises')}
           >
             <Zap size={24} color={theme.colors.primary} />
-            <Text style={styles.featureTitle}>Adaptive Exercises</Text>
+            <Text style={styles.featureTitle}>Eye Exercises</Text>
             <Text style={styles.featureDescription}>
-              Personalized eye exercises that adapt to your progress and needs
+              Comprehensive exercises: 20-20-20 rule, blinking, palming, eye rolling, and more
             </Text>
           </TouchableOpacity>
         </View>
@@ -509,17 +509,17 @@ export default function HomeScreen() {
       )}
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Daily Eye Care</Text>
+        <Text style={styles.sectionTitle}>Eye Care Essentials</Text>
         <View style={styles.grid}>
           <TouchableOpacity style={styles.card}>
             <Clock size={32} color={theme.colors.primary} />
             <Text style={styles.cardTitle}>20-20-20 Rule</Text>
-            <Text style={styles.cardDescription}>Take a 20-second break every 20 minutes</Text>
+            <Text style={styles.cardDescription}>Take a 20-second break every 20 minutes to look at something 20 feet away</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card}>
             <Sun size={32} color={theme.colors.warning} />
-            <Text style={styles.cardTitle}>Blue Light</Text>
-            <Text style={styles.cardDescription}>Adjust screen settings for comfort</Text>
+            <Text style={styles.cardTitle}>Blue Light Filter</Text>
+            <Text style={styles.cardDescription}>Reduce blue light exposure with proper screen settings and filters</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -532,8 +532,8 @@ export default function HomeScreen() {
             onPress={() => router.push('/(tabs)/exercises')}
           >
             <Eye size={24} color={theme.colors.primary} />
-            <Text style={styles.exerciseTitle}>Focus Shift</Text>
-            <Text style={styles.exerciseTime}>2 min</Text>
+            <Text style={styles.exerciseTitle}>Blinking Exercise</Text>
+            <Text style={styles.exerciseTime}>1 min</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.exerciseCard}
@@ -541,7 +541,7 @@ export default function HomeScreen() {
           >
             <Activity size={24} color={theme.colors.primary} />
             <Text style={styles.exerciseTitle}>Eye Rolling</Text>
-            <Text style={styles.exerciseTime}>1 min</Text>
+            <Text style={styles.exerciseTime}>90 sec</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.exerciseCard}
@@ -549,7 +549,7 @@ export default function HomeScreen() {
           >
             <Gamepad2 size={24} color={theme.colors.primary} />
             <Text style={styles.exerciseTitle}>Blink Game</Text>
-            <Text style={styles.exerciseTime}>3 min</Text>
+            <Text style={styles.exerciseTime}>2 min</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.exerciseCard}
@@ -566,15 +566,15 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>Eye Health Tips</Text>
         <View style={styles.tipContainer}>
           <AlertCircle size={24} color={theme.colors.primary} />
-          <Text style={styles.tipText}>Maintain proper screen distance (20-24 inches)</Text>
+          <Text style={styles.tipText}>Maintain proper screen distance (20-24 inches) for optimal eye comfort</Text>
         </View>
         <View style={styles.tipContainer}>
           <Moon size={24} color={theme.colors.primary} />
-          <Text style={styles.tipText}>Reduce screen brightness in dark environments</Text>
+          <Text style={styles.tipText}>Reduce screen brightness in dark environments to prevent strain</Text>
         </View>
         <View style={styles.tipContainer}>
           <Bell size={24} color={theme.colors.primary} />
-          <Text style={styles.tipText}>Enable break reminders for better eye health</Text>
+          <Text style={styles.tipText}>Enable break reminders and practice conscious blinking regularly</Text>
         </View>
       </View>
     </ScrollView>

@@ -52,7 +52,7 @@ export default function TabLayout() {
         options={{
           title: 'Games',
           tabBarIcon: ({ color, size }) => <Gamepad2 size={size} color={color} />,
-          headerTitle: 'Eye Health Games',
+          headerTitle: 'Vision Games',
         }}
       />
       <Tabs.Screen

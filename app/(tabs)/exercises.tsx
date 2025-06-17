@@ -1,80 +1,258 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
-import { Eye, MoveHorizontal, MoveVertical, RotateCcw, Play, Pause, Timer, CircleCheck as CheckCircle } from 'lucide-react-native';
-import { useState, useRef, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+  Alert,
+} from 'react-native';
+import {
+  Eye,
+  Clock,
+  Play,
+  Pause,
+  RotateCcw,
+  Target,
+  Zap,
+  CheckCircle,
+  Timer,
+  Activity,
+  Focus,
+  Hand,
+  Circle,
+  Square,
+  Triangle,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+} from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { width, height } = Dimensions.get('window');
 
 interface Exercise {
-  id: number;
+  id: string;
   title: string;
   description: string;
   icon: any;
-  duration: number; // in seconds
+  duration: number;
   instructions: string[];
-  difficulty: 'easy' | 'medium' | 'hard';
   benefits: string[];
+  difficulty: 'easy' | 'medium' | 'hard';
+  category: 'basic' | 'focus' | 'movement' | 'relaxation';
 }
 
 const exercises: Exercise[] = [
   {
-    id: 1,
-    title: 'Focus Change',
-    description: 'Look at near and far objects alternately',
+    id: '20-20-20',
+    title: '20-20-20 Rule',
+    description: 'Look away from your screen every 20 minutes at an object 20 feet away for 20 seconds',
+    icon: Clock,
+    duration: 20,
+    difficulty: 'easy',
+    category: 'basic',
+    instructions: [
+      'Set a timer for 20 minutes',
+      'When timer goes off, look away from your screen',
+      'Find an object at least 20 feet away',
+      'Focus on that object for 20 seconds',
+      'Return to your work and reset timer'
+    ],
+    benefits: [
+      'Reduces digital eye strain',
+      'Prevents eye fatigue',
+      'Maintains natural blinking',
+      'Relaxes focusing muscles'
+    ]
+  },
+  {
+    id: 'blinking',
+    title: 'Conscious Blinking',
+    description: 'Blink frequently and fully to keep your eyes lubricated',
     icon: Eye,
+    duration: 60,
+    difficulty: 'easy',
+    category: 'basic',
+    instructions: [
+      'Sit comfortably with eyes open',
+      'Blink slowly and deliberately',
+      'Close eyes completely for 1 second',
+      'Open eyes and repeat',
+      'Perform 20 conscious blinks'
+    ],
+    benefits: [
+      'Improves tear distribution',
+      'Reduces dry eye symptoms',
+      'Cleanses eye surface',
+      'Prevents eye irritation'
+    ]
+  },
+  {
+    id: 'palming',
+    title: 'Palming Relaxation',
+    description: 'Warm your palms and gently cup them over closed eyes to relax and reduce strain',
+    icon: Hand,
     duration: 120,
     difficulty: 'easy',
-    benefits: ['Improves focus flexibility', 'Reduces eye strain'],
+    category: 'relaxation',
     instructions: [
-      'Hold your thumb about 10 inches from your face',
-      'Focus on your thumb for 5 seconds',
-      'Look at an object 20 feet away for 5 seconds',
-      'Repeat this process for the duration'
+      'Rub your palms together vigorously for 10 seconds',
+      'Close your eyes gently',
+      'Cup your warm palms over your closed eyes',
+      'Ensure no light enters but don\'t press on eyes',
+      'Breathe deeply and relax for 2 minutes'
+    ],
+    benefits: [
+      'Deeply relaxes eye muscles',
+      'Reduces eye strain',
+      'Improves blood circulation',
+      'Provides mental relaxation'
     ]
   },
   {
-    id: 2,
-    title: 'Horizontal Movement',
-    description: 'Move eyes left to right slowly',
-    icon: MoveHorizontal,
-    duration: 60,
-    difficulty: 'easy',
-    benefits: ['Strengthens eye muscles', 'Improves peripheral vision'],
-    instructions: [
-      'Keep your head still',
-      'Look as far left as comfortable',
-      'Slowly move your gaze to the right',
-      'Repeat this movement smoothly'
-    ]
-  },
-  {
-    id: 3,
-    title: 'Vertical Movement',
-    description: 'Move eyes up and down gently',
-    icon: MoveVertical,
-    duration: 60,
-    difficulty: 'easy',
-    benefits: ['Enhances eye coordination', 'Reduces tension'],
-    instructions: [
-      'Keep your head still',
-      'Look up as far as comfortable',
-      'Slowly move your gaze downward',
-      'Repeat this movement smoothly'
-    ]
-  },
-  {
-    id: 4,
-    title: 'Eye Rolling',
-    description: 'Roll your eyes in circular motion',
+    id: 'eye-rolling',
+    title: 'Eye Rolling Exercise',
+    description: 'Slowly roll your eyes in circular motion to improve eye muscle flexibility',
     icon: RotateCcw,
-    duration: 30,
+    duration: 90,
     difficulty: 'medium',
-    benefits: ['Improves blood circulation', 'Relaxes eye muscles'],
+    category: 'movement',
     instructions: [
-      'Keep your head still',
-      'Roll your eyes clockwise',
-      'Complete 5 rotations',
-      'Repeat counterclockwise'
+      'Sit upright and look straight ahead',
+      'Slowly roll eyes clockwise in a large circle',
+      'Complete 5 clockwise rotations',
+      'Pause and blink a few times',
+      'Roll eyes counterclockwise 5 times',
+      'Finish with gentle blinking'
+    ],
+    benefits: [
+      'Improves eye muscle flexibility',
+      'Enhances blood circulation',
+      'Reduces muscle tension',
+      'Increases range of motion'
+    ]
+  },
+  {
+    id: 'focus-shifting',
+    title: 'Focus Shifting',
+    description: 'Alternate focus between nearby and distant objects to exercise focusing muscles',
+    icon: Target,
+    duration: 120,
+    difficulty: 'medium',
+    category: 'focus',
+    instructions: [
+      'Hold your thumb 10 inches from your face',
+      'Focus on your thumb for 3 seconds',
+      'Shift focus to an object 20 feet away',
+      'Focus on distant object for 3 seconds',
+      'Return focus to your thumb',
+      'Repeat 10 times'
+    ],
+    benefits: [
+      'Strengthens focusing muscles',
+      'Improves accommodation',
+      'Reduces focusing fatigue',
+      'Enhances visual flexibility'
+    ]
+  },
+  {
+    id: 'near-far-focusing',
+    title: 'Near and Far Focusing',
+    description: 'Move thumb closer and farther while maintaining focus',
+    icon: Focus,
+    duration: 90,
+    difficulty: 'medium',
+    category: 'focus',
+    instructions: [
+      'Hold thumb at arm\'s length',
+      'Focus clearly on your thumb',
+      'Slowly bring thumb closer to nose',
+      'Stop when thumb becomes blurry',
+      'Slowly move thumb back to arm\'s length',
+      'Repeat 8-10 times'
+    ],
+    benefits: [
+      'Exercises accommodation',
+      'Improves near vision',
+      'Strengthens ciliary muscles',
+      'Enhances depth perception'
+    ]
+  },
+  {
+    id: 'figure-eight',
+    title: 'Figure Eight Tracing',
+    description: 'Trace an imaginary figure eight with your eyes',
+    icon: Activity,
+    duration: 60,
+    difficulty: 'medium',
+    category: 'movement',
+    instructions: [
+      'Imagine a large figure 8 about 8 feet away',
+      'Trace the figure 8 slowly with your eyes',
+      'Keep head still, move only eyes',
+      'Trace 5 times in one direction',
+      'Reverse direction and trace 5 times',
+      'Blink and rest between sets'
+    ],
+    benefits: [
+      'Improves eye coordination',
+      'Enhances tracking skills',
+      'Strengthens eye muscles',
+      'Increases visual control'
+    ]
+  },
+  {
+    id: 'zooming',
+    title: 'Zooming Exercise',
+    description: 'Focus on thumb while moving it closer and farther',
+    icon: Zap,
+    duration: 75,
+    difficulty: 'hard',
+    category: 'focus',
+    instructions: [
+      'Extend arm with thumb up',
+      'Focus on thumb nail details',
+      'Slowly bring thumb toward nose',
+      'Maintain sharp focus throughout',
+      'Stop before double vision occurs',
+      'Slowly extend arm back out',
+      'Repeat 6-8 times'
+    ],
+    benefits: [
+      'Maximizes accommodation range',
+      'Improves focusing stamina',
+      'Enhances visual concentration',
+      'Strengthens focusing muscles'
+    ]
+  },
+  {
+    id: 'pencil-pushups',
+    title: 'Pencil Push-ups',
+    description: 'Focus on pencil tip while moving it closer until it blurs',
+    icon: Triangle,
+    duration: 90,
+    difficulty: 'hard',
+    category: 'focus',
+    instructions: [
+      'Hold pencil at arm\'s length vertically',
+      'Focus on the pencil tip',
+      'Slowly bring pencil toward nose',
+      'Keep single, clear image',
+      'Stop when pencil doubles or blurs',
+      'Slowly move back to clear focus',
+      'Repeat 10-15 times'
+    ],
+    benefits: [
+      'Improves convergence',
+      'Strengthens eye teaming',
+      'Enhances binocular vision',
+      'Reduces eye strain'
     ]
   }
 ];
@@ -85,66 +263,17 @@ export default function ExercisesScreen() {
   const [activeExercise, setActiveExercise] = useState<Exercise | null>(null);
   const [isExercising, setIsExercising] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
-  const [completedExercises, setCompletedExercises] = useState<number[]>([]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [completedExercises, setCompletedExercises] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [dailyStreak, setDailyStreak] = useState(0);
+  
   const progressAnimation = useRef(new Animated.Value(0)).current;
+  const pulseAnimation = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     loadCompletedExercises();
   }, []);
-
-  const loadCompletedExercises = async () => {
-    try {
-      const saved = await AsyncStorage.getItem('completedExercises');
-      const today = new Date().toDateString();
-      const lastCompletedDate = await AsyncStorage.getItem('lastCompletedDate');
-      
-      if (saved) {
-        const completed = JSON.parse(saved);
-        if (lastCompletedDate === today) {
-          setCompletedExercises(completed);
-        } else {
-          // Reset daily exercises
-          setCompletedExercises([]);
-          await AsyncStorage.setItem('completedExercises', JSON.stringify([]));
-        }
-      }
-
-      // Load streak
-      const streak = await AsyncStorage.getItem('exerciseStreak');
-      if (streak) {
-        setDailyStreak(parseInt(streak));
-      }
-    } catch (error) {
-      console.error('Error loading completed exercises:', error);
-    }
-  };
-
-  const saveCompletedExercise = async (exerciseId: number) => {
-    try {
-      const updatedCompleted = [...completedExercises, exerciseId];
-      const today = new Date().toDateString();
-      
-      await AsyncStorage.setItem('completedExercises', JSON.stringify(updatedCompleted));
-      await AsyncStorage.setItem('lastCompletedDate', today);
-      setCompletedExercises(updatedCompleted);
-
-      // Update user stats
-      if (user) {
-        await updateStats({ 
-          totalExercises: (user.stats.totalExercises || 0) + 1,
-          streakDays: dailyStreak + 1,
-        });
-      }
-
-      // Update streak
-      const newStreak = dailyStreak + 1;
-      setDailyStreak(newStreak);
-      await AsyncStorage.setItem('exerciseStreak', newStreak.toString());
-    } catch (error) {
-      console.error('Error saving completed exercise:', error);
-    }
-  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -153,10 +282,7 @@ export default function ExercisesScreen() {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
           if (newTime === 0) {
-            setIsExercising(false);
-            if (activeExercise) {
-              saveCompletedExercise(activeExercise.id);
-            }
+            completeExercise();
           }
           return newTime;
         });
@@ -176,11 +302,88 @@ export default function ExercisesScreen() {
     }
   }, [timeLeft, activeExercise]);
 
+  useEffect(() => {
+    if (isExercising) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnimation, {
+            toValue: 1.1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnimation, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    } else {
+      pulseAnimation.setValue(1);
+    }
+  }, [isExercising]);
+
+  const loadCompletedExercises = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('completedExercises');
+      const today = new Date().toDateString();
+      const lastCompletedDate = await AsyncStorage.getItem('lastCompletedDate');
+      
+      if (saved && lastCompletedDate === today) {
+        setCompletedExercises(JSON.parse(saved));
+      } else {
+        setCompletedExercises([]);
+        await AsyncStorage.setItem('completedExercises', JSON.stringify([]));
+      }
+
+      const streak = await AsyncStorage.getItem('exerciseStreak');
+      if (streak) {
+        setDailyStreak(parseInt(streak));
+      }
+    } catch (error) {
+      console.error('Error loading completed exercises:', error);
+    }
+  };
+
   const startExercise = (exercise: Exercise) => {
     setActiveExercise(exercise);
     setTimeLeft(exercise.duration);
+    setCurrentStep(0);
     setIsExercising(true);
     progressAnimation.setValue(0);
+  };
+
+  const completeExercise = async () => {
+    if (!activeExercise) return;
+
+    setIsExercising(false);
+    const updatedCompleted = [...completedExercises, activeExercise.id];
+    const today = new Date().toDateString();
+    
+    try {
+      await AsyncStorage.setItem('completedExercises', JSON.stringify(updatedCompleted));
+      await AsyncStorage.setItem('lastCompletedDate', today);
+      setCompletedExercises(updatedCompleted);
+
+      if (user) {
+        await updateStats({ 
+          totalExercises: (user.stats.totalExercises || 0) + 1,
+          streakDays: dailyStreak + 1,
+        });
+      }
+
+      const newStreak = dailyStreak + 1;
+      setDailyStreak(newStreak);
+      await AsyncStorage.setItem('exerciseStreak', newStreak.toString());
+
+      Alert.alert(
+        'Exercise Complete!',
+        `Great job completing ${activeExercise.title}. Keep up the good work!`,
+        [{ text: 'Continue', onPress: () => setActiveExercise(null) }]
+      );
+    } catch (error) {
+      console.error('Error saving completed exercise:', error);
+    }
   };
 
   const toggleExercise = () => {
@@ -191,6 +394,7 @@ export default function ExercisesScreen() {
     setActiveExercise(null);
     setIsExercising(false);
     setTimeLeft(0);
+    setCurrentStep(0);
     progressAnimation.setValue(0);
   };
 
@@ -209,36 +413,55 @@ export default function ExercisesScreen() {
     }
   };
 
-  const getFilteredExercises = () => {
-    if (!user) return exercises;
-    
-    const userDifficulty = user.preferences.exerciseDifficulty;
-    return exercises.filter(exercise => {
-      if (userDifficulty === 'easy') return exercise.difficulty === 'easy';
-      if (userDifficulty === 'medium') return ['easy', 'medium'].includes(exercise.difficulty);
-      return true; // hard includes all
-    });
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'basic': return theme.colors.primary;
+      case 'focus': return theme.colors.accent;
+      case 'movement': return theme.colors.warning;
+      case 'relaxation': return theme.colors.success;
+      default: return theme.colors.textSecondary;
+    }
   };
+
+  const getFilteredExercises = () => {
+    if (selectedCategory === 'all') return exercises;
+    return exercises.filter(exercise => exercise.category === selectedCategory);
+  };
+
+  const categories = [
+    { id: 'all', name: 'All Exercises', icon: Activity },
+    { id: 'basic', name: 'Basic', icon: Eye },
+    { id: 'focus', name: 'Focus', icon: Target },
+    { id: 'movement', name: 'Movement', icon: RotateCcw },
+    { id: 'relaxation', name: 'Relaxation', icon: Hand },
+  ];
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
-      padding: 16,
     },
     header: {
-      marginBottom: 20,
+      padding: 20,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
     },
     headerTitle: {
-      fontSize: 24,
-      fontWeight: '600',
+      fontSize: 28,
+      fontWeight: '700',
       color: theme.colors.text,
       marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      marginBottom: 16,
     },
     streakContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.background,
       padding: 12,
       borderRadius: 12,
       marginBottom: 16,
@@ -253,102 +476,155 @@ export default function ExercisesScreen() {
       fontWeight: '700',
       color: theme.colors.primary,
     },
-    exerciseCard: {
+    categoriesContainer: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+    },
+    categoriesScroll: {
       flexDirection: 'row',
+      gap: 12,
+    },
+    categoryChip: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
       backgroundColor: theme.colors.surface,
-      borderRadius: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    categoryChipActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    categoryChipText: {
+      fontSize: 14,
+      color: theme.colors.text,
+      fontWeight: '500',
+      marginLeft: 6,
+    },
+    categoryChipTextActive: {
+      color: '#FFFFFF',
+    },
+    exercisesList: {
       padding: 16,
+    },
+    exerciseCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      padding: 20,
       marginBottom: 16,
       shadowColor: theme.colors.text,
-      shadowOffset: { width: 0, height: 2 },
+      shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 3,
+      shadowRadius: 12,
+      elevation: 5,
     },
     completedExercise: {
-      backgroundColor: theme.colors.surface,
       borderColor: theme.colors.success,
       borderWidth: 2,
     },
-    iconContainer: {
-      width: 60,
-      height: 60,
-      backgroundColor: theme.colors.background,
-      borderRadius: 30,
-      justifyContent: 'center',
+    exerciseHeader: {
+      flexDirection: 'row',
       alignItems: 'center',
+      marginBottom: 12,
+    },
+    exerciseIcon: {
+      marginRight: 12,
     },
     exerciseInfo: {
       flex: 1,
-      marginLeft: 16,
-    },
-    exerciseHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginBottom: 4,
     },
     exerciseTitle: {
       fontSize: 18,
-      fontWeight: '600',
+      fontWeight: '700',
       color: theme.colors.text,
-      flex: 1,
+      marginBottom: 4,
+    },
+    exerciseDescription: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+    },
+    exerciseMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 8,
+      gap: 12,
+    },
+    metaItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    metaText: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginLeft: 4,
     },
     difficultyBadge: {
       paddingHorizontal: 8,
       paddingVertical: 2,
       borderRadius: 12,
-      marginLeft: 8,
     },
     difficultyText: {
-      fontSize: 12,
+      fontSize: 10,
       fontWeight: '600',
       color: '#FFFFFF',
     },
-    exerciseDescription: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      marginBottom: 8,
+    categoryBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 12,
     },
-    exerciseFooter: {
+    categoryText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: '#FFFFFF',
+    },
+    startButton: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: 12,
+      padding: 16,
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 16,
     },
-    duration: {
-      fontSize: 14,
-      color: theme.colors.primary,
-      fontWeight: '500',
+    startButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: 8,
     },
     completedIcon: {
       marginLeft: 8,
     },
     activeExerciseContainer: {
+      flex: 1,
       backgroundColor: theme.colors.surface,
-      borderRadius: 16,
+      margin: 16,
+      borderRadius: 20,
       padding: 20,
-      alignItems: 'center',
-      marginBottom: 20,
     },
     activeExerciseTitle: {
       fontSize: 24,
-      fontWeight: '600',
+      fontWeight: '700',
       color: theme.colors.text,
-      marginBottom: 16,
       textAlign: 'center',
+      marginBottom: 16,
     },
     timerContainer: {
-      flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 20,
+      marginBottom: 24,
     },
     timerText: {
-      fontSize: 32,
+      fontSize: 48,
       fontWeight: '700',
       color: theme.colors.primary,
-      marginLeft: 8,
+      marginTop: 8,
     },
-    progressBar: {
+    progressBarContainer: {
       width: '100%',
       height: 8,
       backgroundColor: theme.colors.background,
@@ -356,39 +632,50 @@ export default function ExercisesScreen() {
       marginBottom: 24,
       overflow: 'hidden',
     },
-    progressFill: {
+    progressBar: {
       height: '100%',
       backgroundColor: theme.colors.primary,
     },
     instructionsContainer: {
-      width: '100%',
       marginBottom: 24,
+    },
+    instructionsTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 12,
     },
     instructionItem: {
       flexDirection: 'row',
       alignItems: 'flex-start',
       marginBottom: 12,
+      backgroundColor: theme.colors.background,
+      padding: 12,
+      borderRadius: 8,
     },
     instructionNumber: {
       width: 24,
       height: 24,
       borderRadius: 12,
       backgroundColor: theme.colors.primary,
-      color: '#FFFFFF',
-      textAlign: 'center',
-      lineHeight: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
       marginRight: 12,
+    },
+    instructionNumberText: {
+      color: '#FFFFFF',
       fontSize: 12,
       fontWeight: '600',
     },
     instructionText: {
       flex: 1,
-      fontSize: 16,
+      fontSize: 14,
       color: theme.colors.text,
-      lineHeight: 24,
+      lineHeight: 20,
     },
     controlButtons: {
       flexDirection: 'row',
+      justifyContent: 'center',
       gap: 16,
     },
     controlButton: {
@@ -408,8 +695,7 @@ export default function ExercisesScreen() {
       backgroundColor: theme.colors.error,
     },
     benefitsContainer: {
-      width: '100%',
-      marginBottom: 16,
+      marginTop: 16,
     },
     benefitsTitle: {
       fontSize: 16,
@@ -418,37 +704,34 @@ export default function ExercisesScreen() {
       marginBottom: 8,
     },
     benefitItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 6,
+    },
+    benefitText: {
       fontSize: 14,
       color: theme.colors.textSecondary,
-      marginBottom: 4,
+      marginLeft: 8,
     },
   });
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Daily Eye Exercises</Text>
-        <View style={styles.streakContainer}>
-          <CheckCircle size={20} color={theme.colors.success} />
-          <Text style={styles.streakText}>
-            Daily streak: <Text style={styles.streakNumber}>{dailyStreak} days</Text>
-          </Text>
-        </View>
-      </View>
-      
-      {activeExercise ? (
+  if (activeExercise) {
+    return (
+      <View style={styles.container}>
         <View style={styles.activeExerciseContainer}>
           <Text style={styles.activeExerciseTitle}>{activeExercise.title}</Text>
           
           <View style={styles.timerContainer}>
-            <Timer size={24} color={theme.colors.primary} />
+            <Animated.View style={{ transform: [{ scale: pulseAnimation }] }}>
+              <Timer size={32} color={theme.colors.primary} />
+            </Animated.View>
             <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
           </View>
           
-          <View style={styles.progressBar}>
+          <View style={styles.progressBarContainer}>
             <Animated.View
               style={[
-                styles.progressFill,
+                styles.progressBar,
                 {
                   width: progressAnimation.interpolate({
                     inputRange: [0, 1],
@@ -459,18 +742,24 @@ export default function ExercisesScreen() {
             />
           </View>
 
-          <View style={styles.benefitsContainer}>
-            <Text style={styles.benefitsTitle}>Benefits:</Text>
-            {activeExercise.benefits.map((benefit, index) => (
-              <Text key={index} style={styles.benefitItem}>• {benefit}</Text>
+          <View style={styles.instructionsContainer}>
+            <Text style={styles.instructionsTitle}>Instructions:</Text>
+            {activeExercise.instructions.map((instruction, index) => (
+              <View key={index} style={styles.instructionItem}>
+                <View style={styles.instructionNumber}>
+                  <Text style={styles.instructionNumberText}>{index + 1}</Text>
+                </View>
+                <Text style={styles.instructionText}>{instruction}</Text>
+              </View>
             ))}
           </View>
 
-          <View style={styles.instructionsContainer}>
-            {activeExercise.instructions.map((instruction, index) => (
-              <View key={index} style={styles.instructionItem}>
-                <Text style={styles.instructionNumber}>{index + 1}</Text>
-                <Text style={styles.instructionText}>{instruction}</Text>
+          <View style={styles.benefitsContainer}>
+            <Text style={styles.benefitsTitle}>Benefits:</Text>
+            {activeExercise.benefits.map((benefit, index) => (
+              <View key={index} style={styles.benefitItem}>
+                <CheckCircle size={16} color={theme.colors.success} />
+                <Text style={styles.benefitText}>{benefit}</Text>
               </View>
             ))}
           </View>
@@ -478,12 +767,14 @@ export default function ExercisesScreen() {
           <View style={styles.controlButtons}>
             <TouchableOpacity
               style={[styles.controlButton, styles.stopButton]}
-              onPress={stopExercise}>
+              onPress={stopExercise}
+            >
               <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}>STOP</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.controlButton}
-              onPress={toggleExercise}>
+              onPress={toggleExercise}
+            >
               {isExercising ? (
                 <Pause size={24} color="#FFFFFF" />
               ) : (
@@ -492,36 +783,91 @@ export default function ExercisesScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      ) : (
-        getFilteredExercises().map((exercise) => (
-          <TouchableOpacity
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Eye Exercises</Text>
+        <Text style={styles.subtitle}>
+          Comprehensive eye exercises to improve vision health and reduce strain
+        </Text>
+        
+        <View style={styles.streakContainer}>
+          <CheckCircle size={20} color={theme.colors.success} />
+          <Text style={styles.streakText}>
+            Daily streak: <Text style={styles.streakNumber}>{dailyStreak} days</Text>
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.categoriesContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.categoryChip,
+                selectedCategory === category.id && styles.categoryChipActive,
+              ]}
+              onPress={() => setSelectedCategory(category.id)}
+            >
+              <category.icon 
+                size={16} 
+                color={selectedCategory === category.id ? '#FFFFFF' : theme.colors.text}
+              />
+              <Text style={[
+                styles.categoryChipText,
+                selectedCategory === category.id && styles.categoryChipTextActive,
+              ]}>
+                {category.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      <View style={styles.exercisesList}>
+        {getFilteredExercises().map((exercise) => (
+          <View
             key={exercise.id}
             style={[
               styles.exerciseCard,
               completedExercises.includes(exercise.id) && styles.completedExercise,
             ]}
-            onPress={() => startExercise(exercise)}>
-            <View style={styles.iconContainer}>
-              <exercise.icon size={32} color={theme.colors.primary} />
-            </View>
-            <View style={styles.exerciseInfo}>
-              <View style={styles.exerciseHeader}>
+          >
+            <View style={styles.exerciseHeader}>
+              <exercise.icon size={32} color={theme.colors.primary} style={styles.exerciseIcon} />
+              <View style={styles.exerciseInfo}>
                 <Text style={styles.exerciseTitle}>{exercise.title}</Text>
-                <View style={[styles.difficultyBadge, { backgroundColor: getDifficultyColor(exercise.difficulty) }]}>
-                  <Text style={styles.difficultyText}>{exercise.difficulty.toUpperCase()}</Text>
+                <Text style={styles.exerciseDescription}>{exercise.description}</Text>
+                <View style={styles.exerciseMeta}>
+                  <View style={styles.metaItem}>
+                    <Clock size={12} color={theme.colors.textSecondary} />
+                    <Text style={styles.metaText}>{formatTime(exercise.duration)}</Text>
+                  </View>
+                  <View style={[styles.difficultyBadge, { backgroundColor: getDifficultyColor(exercise.difficulty) }]}>
+                    <Text style={styles.difficultyText}>{exercise.difficulty.toUpperCase()}</Text>
+                  </View>
+                  <View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(exercise.category) }]}>
+                    <Text style={styles.categoryText}>{exercise.category.toUpperCase()}</Text>
+                  </View>
                 </View>
               </View>
-              <Text style={styles.exerciseDescription}>{exercise.description}</Text>
-              <View style={styles.exerciseFooter}>
-                <Text style={styles.duration}>{formatTime(exercise.duration)}</Text>
-                {completedExercises.includes(exercise.id) && (
-                  <CheckCircle size={20} color={theme.colors.success} style={styles.completedIcon} />
-                )}
-              </View>
+              {completedExercises.includes(exercise.id) && (
+                <CheckCircle size={24} color={theme.colors.success} style={styles.completedIcon} />
+              )}
             </View>
-          </TouchableOpacity>
-        ))
-      )}
+
+            <TouchableOpacity style={styles.startButton} onPress={() => startExercise(exercise)}>
+              <Play size={20} color="#FFFFFF" />
+              <Text style={styles.startButtonText}>Start Exercise</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 }
