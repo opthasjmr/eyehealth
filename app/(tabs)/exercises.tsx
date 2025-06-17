@@ -9,27 +9,7 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import {
-  Eye,
-  Clock,
-  Play,
-  Pause,
-  RotateCcw,
-  Target,
-  Zap,
-  CheckCircle,
-  Timer,
-  Activity,
-  Focus,
-  Hand,
-  Circle,
-  Square,
-  Triangle,
-  ArrowUp,
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-} from 'lucide-react-native';
+import { Eye, Clock, Play, Pause, RotateCcw, Target, Zap, CircleCheck as CheckCircle, Timer, Activity, Focus, Hand, Circle, Square, Triangle, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
