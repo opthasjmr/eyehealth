@@ -18,33 +18,7 @@ import Animated, {
   runOnJS,
   interpolateColor,
 } from 'react-native-reanimated';
-import { 
-  Gamepad2, 
-  Eye, 
-  Target, 
-  Zap, 
-  Star, 
-  Trophy,
-  Play,
-  Pause,
-  RotateCcw,
-  Award,
-  TrendingUp,
-  Search,
-  Palette,
-  Focus,
-  Brain,
-  Timer,
-  CheckCircle,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  ArrowDown,
-  Circle,
-  Square,
-  Triangle,
-  Hexagon,
-} from 'lucide-react-native';
+import { Gamepad2, Eye, Target, Zap, Star, Trophy, Play, Pause, RotateCcw, Award, TrendingUp, Search, Palette, Focus, Brain, Timer, CircleCheck as CheckCircle, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Circle, Square, Triangle, Hexagon } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
