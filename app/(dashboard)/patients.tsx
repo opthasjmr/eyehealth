@@ -9,21 +9,7 @@ import {
   Modal,
   Alert,
 } from 'react-native';
-import {
-  Users,
-  Plus,
-  Search,
-  Filter,
-  Calendar,
-  Phone,
-  Mail,
-  FileText,
-  Edit,
-  Trash2,
-  Eye,
-  X,
-  User,
-} from 'lucide-react-native';
+import { Users, Plus, Search, Filter, Calendar, Phone, Mail, FileText, CreditCard as Edit, Trash2, Eye, X, User } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePatients, Patient } from '@/contexts/PatientContext';
 
