@@ -8,25 +8,7 @@ import {
   Switch,
   Alert,
 } from 'react-native';
-import {
-  Settings,
-  User,
-  Bell,
-  Shield,
-  Palette,
-  Database,
-  HelpCircle,
-  LogOut,
-  ChevronRight,
-  Moon,
-  Sun,
-  Volume2,
-  VolumeX,
-  Eye,
-  Brain,
-  FileText,
-  Download,
-} from 'lucide-react-native';
+import { Settings, User, Bell, Shield, Palette, Database, CircleHelp as HelpCircle, LogOut, ChevronRight, Moon, Sun, Volume2, VolumeX, Eye, Brain, FileText, Download } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 

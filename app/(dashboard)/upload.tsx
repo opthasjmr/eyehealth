@@ -10,21 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import {
-  Upload,
-  FileImage,
-  X,
-  CheckCircle,
-  AlertTriangle,
-  Eye,
-  Brain,
-  FileText,
-  Download,
-  Share,
-  Clock,
-  Target,
-  TrendingUp,
-} from 'lucide-react-native';
+import { Upload, FileImage, X, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Eye, Brain, FileText, Download, Share, Clock, Target, TrendingUp } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePatients } from '@/contexts/PatientContext';
 

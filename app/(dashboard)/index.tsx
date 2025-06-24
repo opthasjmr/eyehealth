@@ -7,22 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import {
-  LayoutDashboard,
-  Upload,
-  Users,
-  FileText,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Eye,
-  Brain,
-  Activity,
-  Calendar,
-  BarChart3,
-  PieChart,
-} from 'lucide-react-native';
+import { LayoutDashboard, Upload, Users, FileText, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, Clock, Eye, Brain, Activity, Calendar, ChartBar as BarChart3, ChartPie as PieChart } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePatients } from '@/contexts/PatientContext';

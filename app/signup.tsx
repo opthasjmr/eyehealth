@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Eye, Mail, Lock, User, Building, ArrowLeft, CheckCircle } from 'lucide-react-native';
+import { Eye, Mail, Lock, User, Building, ArrowLeft, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 
