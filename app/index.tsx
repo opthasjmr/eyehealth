@@ -9,20 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { router } from 'expo-router';
-import {
-  Eye,
-  Brain,
-  Shield,
-  Users,
-  FileText,
-  TrendingUp,
-  CheckCircle,
-  ArrowRight,
-  Stethoscope,
-  Activity,
-  Award,
-  Clock,
-} from 'lucide-react-native';
+import { Eye, Brain, Shield, Users, FileText, TrendingUp, CircleCheck as CheckCircle, ArrowRight, Stethoscope, Activity, Award, Clock } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const { width } = Dimensions.get('window');
