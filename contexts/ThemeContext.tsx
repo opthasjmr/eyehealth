@@ -58,6 +58,8 @@ interface ThemeContextType {
   theme: Theme;
   isDark: boolean;
   toggleTheme: () => void;
+  blueLight: boolean;
+  toggleBlueLight: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -76,6 +78,7 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [isDark, setIsDark] = useState(false);
+  const [blueLight, setBlueLight] = useState(false);
 
   useEffect(() => {
     loadThemePreference();
@@ -84,8 +87,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const loadThemePreference = async () => {
     try {
       const savedTheme = await AsyncStorage.getItem('theme');
+      const savedBlueLight = await AsyncStorage.getItem('blueLight');
+      
       if (savedTheme) {
         setIsDark(savedTheme === 'dark');
+      }
+      if (savedBlueLight) {
+        setBlueLight(savedBlueLight === 'true');
       }
     } catch (error) {
       console.error('Error loading theme preference:', error);
@@ -102,10 +110,20 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
   };
 
+  const toggleBlueLight = async () => {
+    try {
+      const newBlueLight = !blueLight;
+      setBlueLight(newBlueLight);
+      await AsyncStorage.setItem('blueLight', newBlueLight.toString());
+    } catch (error) {
+      console.error('Error saving blue light preference:', error);
+    }
+  };
+
   const theme = isDark ? darkTheme : lightTheme;
 
   return (
-    <ThemeContext.Provider value={{ theme, isDark, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, isDark, toggleTheme, blueLight, toggleBlueLight }}>
       {children}
     </ThemeContext.Provider>
   );

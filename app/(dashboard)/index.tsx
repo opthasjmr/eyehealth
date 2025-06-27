@@ -6,39 +6,94 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Platform,
 } from 'react-native';
-import { LayoutDashboard, Upload, Users, FileText, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, Clock, Eye, Brain, Activity, Calendar, ChartBar as BarChart3, ChartPie as PieChart } from 'lucide-react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  withSequence,
+  interpolate,
+} from 'react-native-reanimated';
+import { 
+  LayoutDashboard, 
+  Upload, 
+  Users, 
+  FileText, 
+  TrendingUp, 
+  Eye, 
+  Brain, 
+  Activity, 
+  Calendar, 
+  Cpu,
+  Zap,
+  Shield,
+  Target,
+  CheckCircle,
+  AlertTriangle,
+  Clock,
+  Database,
+  Microscope,
+  BarChart3,
+  PieChart,
+} from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePatients } from '@/contexts/PatientContext';
+import { useAI } from '@/contexts/AIContext';
 import { router } from 'expo-router';
-import { LineChart, BarChart, PieChart as RechartsPieChart } from 'recharts';
+import { LinearGradient } from 'expo-linear-gradient';
+import { GlassCard } from '@/components/MaterialUI/GlassCard';
+import { NeumorphicCard } from '@/components/MaterialUI/NeumorphicCard';
+import { MaterialButton } from '@/components/MaterialUI/MaterialButton';
+import { FloatingActionButton } from '@/components/MaterialUI/FloatingActionButton';
+import { EyeModel3D } from '@/components/3D/EyeModel3D';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function DashboardScreen() {
   const { theme } = useTheme();
   const { user } = useAuth();
   const { patients, analyses } = usePatients();
+  const { models, diagnosticResults } = useAI();
   const [timeRange, setTimeRange] = useState('week');
 
-  // Mock data for charts
-  const weeklyAnalyses = [
-    { day: 'Mon', count: 12 },
-    { day: 'Tue', count: 19 },
-    { day: 'Wed', count: 15 },
-    { day: 'Thu', count: 22 },
-    { day: 'Fri', count: 18 },
-    { day: 'Sat', count: 8 },
-    { day: 'Sun', count: 5 },
-  ];
+  // Animations
+  const pulseAnimation = useSharedValue(1);
+  const slideAnimation = useSharedValue(0);
+  const rotateAnimation = useSharedValue(0);
 
-  const conditionDistribution = [
-    { name: 'Diabetic Retinopathy', value: 35, color: theme.colors.error },
-    { name: 'Glaucoma', value: 25, color: theme.colors.warning },
-    { name: 'AMD', value: 20, color: theme.colors.primary },
-    { name: 'Normal', value: 20, color: theme.colors.success },
-  ];
+  useEffect(() => {
+    // Pulse animation for key metrics
+    pulseAnimation.value = withRepeat(
+      withSequence(
+        withTiming(1.05, { duration: 2000 }),
+        withTiming(1, { duration: 2000 })
+      ),
+      -1,
+      true
+    );
+
+    // Slide in animation
+    slideAnimation.value = withTiming(1, { duration: 1000 });
+
+    // Rotation animation for 3D elements
+    rotateAnimation.value = withRepeat(
+      withTiming(360, { duration: 10000 }),
+      -1,
+      false
+    );
+  }, []);
+
+  // Mock data for enhanced dashboard
+  const aiMetrics = {
+    totalAnalyses: 2847,
+    accuracy: 96.8,
+    processingTime: 2.3,
+    modelsActive: 4,
+    uptime: 99.9,
+  };
 
   const recentAnalyses = [
     {
@@ -46,31 +101,41 @@ export default function DashboardScreen() {
       patientName: 'Sarah Johnson',
       condition: 'Diabetic Retinopathy',
       severity: 'Moderate',
-      date: '2024-06-24',
-      confidence: 92,
+      date: '2024-12-15',
+      confidence: 94.2,
       status: 'completed',
+      riskLevel: 'moderate',
     },
     {
       id: '2',
       patientName: 'Michael Chen',
       condition: 'Glaucoma Suspect',
       severity: 'Mild',
-      date: '2024-06-24',
-      confidence: 87,
+      date: '2024-12-15',
+      confidence: 89.7,
       status: 'completed',
+      riskLevel: 'low',
     },
     {
       id: '3',
       patientName: 'Emily Davis',
-      condition: 'Normal',
-      severity: 'N/A',
-      date: '2024-06-23',
-      confidence: 95,
+      condition: 'Normal Retina',
+      severity: 'Normal',
+      date: '2024-12-14',
+      confidence: 97.1,
       status: 'completed',
+      riskLevel: 'low',
     },
   ];
 
   const quickActions = [
+    {
+      title: 'AI Diagnostics',
+      description: 'Advanced AI analysis',
+      icon: Brain,
+      color: '#8B5CF6',
+      onPress: () => router.push('/(dashboard)/ai-diagnostics'),
+    },
     {
       title: 'Upload Images',
       description: 'Start new analysis',
@@ -79,15 +144,15 @@ export default function DashboardScreen() {
       onPress: () => router.push('/(dashboard)/upload'),
     },
     {
-      title: 'Add Patient',
-      description: 'Create patient profile',
+      title: 'Patient Records',
+      description: 'Manage patients',
       icon: Users,
       color: theme.colors.success,
       onPress: () => router.push('/(dashboard)/patients'),
     },
     {
-      title: 'View Reports',
-      description: 'Generate reports',
+      title: 'Generate Reports',
+      description: 'Create medical reports',
       icon: FileText,
       color: theme.colors.warning,
       onPress: () => router.push('/(dashboard)/reports'),
@@ -96,11 +161,12 @@ export default function DashboardScreen() {
 
   const stats = [
     {
-      title: 'Total Analyses',
-      value: '1,247',
-      change: '+12%',
+      title: 'AI Analyses Today',
+      value: '47',
+      change: '+23%',
       changeType: 'positive',
       icon: Brain,
+      color: '#8B5CF6',
     },
     {
       title: 'Active Patients',
@@ -108,22 +174,86 @@ export default function DashboardScreen() {
       change: '+8%',
       changeType: 'positive',
       icon: Users,
+      color: theme.colors.success,
     },
     {
-      title: 'Avg. Confidence',
-      value: '94.2%',
+      title: 'AI Accuracy',
+      value: '96.8%',
       change: '+2.1%',
       changeType: 'positive',
-      icon: CheckCircle,
+      icon: Target,
+      color: theme.colors.primary,
     },
     {
-      title: 'Processing Time',
+      title: 'Processing Speed',
       value: '2.3s',
       change: '-15%',
       changeType: 'positive',
-      icon: Clock,
+      icon: Zap,
+      color: theme.colors.warning,
     },
   ];
+
+  const systemStatus = [
+    {
+      name: 'AI Models',
+      status: 'operational',
+      value: '4/4 Active',
+      icon: Cpu,
+    },
+    {
+      name: 'Processing Queue',
+      status: 'operational',
+      value: '3 pending',
+      icon: Database,
+    },
+    {
+      name: 'System Health',
+      status: 'operational',
+      value: '99.9% uptime',
+      icon: Activity,
+    },
+    {
+      name: 'Security',
+      status: 'operational',
+      value: 'HIPAA Compliant',
+      icon: Shield,
+    },
+  ];
+
+  // Animated styles
+  const pulseAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnimation.value }],
+  }));
+
+  const slideAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: slideAnimation.value,
+    transform: [
+      { translateY: interpolate(slideAnimation.value, [0, 1], [50, 0]) }
+    ],
+  }));
+
+  const rotateAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotateAnimation.value}deg` }],
+  }));
+
+  const getRiskColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'low': return theme.colors.success;
+      case 'moderate': return theme.colors.warning;
+      case 'high': return theme.colors.error;
+      default: return theme.colors.textSecondary;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'operational': return theme.colors.success;
+      case 'warning': return theme.colors.warning;
+      case 'error': return theme.colors.error;
+      default: return theme.colors.textSecondary;
+    }
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -132,9 +262,20 @@ export default function DashboardScreen() {
     },
     header: {
       padding: 24,
+      paddingTop: Platform.OS === 'ios' ? 60 : 40,
       backgroundColor: theme.colors.surface,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border,
+    },
+    headerGradient: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 200,
+    },
+    headerContent: {
+      zIndex: 1,
     },
     headerTop: {
       flexDirection: 'row',
@@ -143,22 +284,22 @@ export default function DashboardScreen() {
       marginBottom: 16,
     },
     title: {
-      fontSize: 28,
+      fontSize: 32,
       fontFamily: 'Inter-Bold',
-      color: theme.colors.text,
+      color: '#FFFFFF',
     },
     dateTime: {
       fontSize: 14,
-      color: theme.colors.textSecondary,
+      color: 'rgba(255, 255, 255, 0.8)',
     },
     welcome: {
-      fontSize: 16,
-      color: theme.colors.textSecondary,
+      fontSize: 18,
+      color: 'rgba(255, 255, 255, 0.9)',
       marginBottom: 8,
     },
     subtitle: {
       fontSize: 14,
-      color: theme.colors.textSecondary,
+      color: 'rgba(255, 255, 255, 0.7)',
     },
     content: {
       flex: 1,
@@ -174,8 +315,8 @@ export default function DashboardScreen() {
       marginBottom: 16,
     },
     sectionTitle: {
-      fontSize: 20,
-      fontFamily: 'Inter-SemiBold',
+      fontSize: 24,
+      fontFamily: 'Inter-Bold',
       color: theme.colors.text,
     },
     viewAllButton: {
@@ -185,7 +326,7 @@ export default function DashboardScreen() {
     viewAllText: {
       fontSize: 14,
       color: theme.colors.primary,
-      fontFamily: 'Inter-Medium',
+      fontFamily: 'Inter-SemiBold',
       marginRight: 4,
     },
     statsGrid: {
@@ -194,16 +335,26 @@ export default function DashboardScreen() {
       gap: 16,
     },
     statCard: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: 12,
-      padding: 20,
       flex: 1,
       minWidth: (width - 80) / 2,
+      borderRadius: 20,
+      padding: 20,
       shadowColor: theme.colors.text,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 3,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.15,
+      shadowRadius: 24,
+      elevation: 8,
+    },
+    statGradient: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: 20,
+    },
+    statContent: {
+      zIndex: 1,
     },
     statHeader: {
       flexDirection: 'row',
@@ -212,53 +363,49 @@ export default function DashboardScreen() {
       marginBottom: 12,
     },
     statIcon: {
-      padding: 8,
-      borderRadius: 8,
-      backgroundColor: theme.colors.background,
+      padding: 12,
+      borderRadius: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
     },
     statValue: {
-      fontSize: 24,
+      fontSize: 28,
       fontFamily: 'Inter-Bold',
-      color: theme.colors.text,
+      color: '#FFFFFF',
       marginBottom: 4,
     },
     statTitle: {
       fontSize: 14,
-      color: theme.colors.textSecondary,
+      color: 'rgba(255, 255, 255, 0.9)',
       marginBottom: 8,
     },
     statChange: {
       fontSize: 12,
-      fontFamily: 'Inter-Medium',
-    },
-    positiveChange: {
-      color: theme.colors.success,
-    },
-    negativeChange: {
-      color: theme.colors.error,
+      fontFamily: 'Inter-SemiBold',
+      color: 'rgba(255, 255, 255, 0.8)',
     },
     quickActionsGrid: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: 16,
     },
     actionCard: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: 12,
-      padding: 20,
       flex: 1,
+      minWidth: (width - 80) / 2,
+      borderRadius: 20,
+      padding: 20,
       alignItems: 'center',
       shadowColor: theme.colors.text,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 3,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.15,
+      shadowRadius: 24,
+      elevation: 8,
     },
     actionIcon: {
       marginBottom: 12,
     },
     actionTitle: {
       fontSize: 16,
-      fontFamily: 'Inter-SemiBold',
+      fontFamily: 'Inter-Bold',
       color: theme.colors.text,
       marginBottom: 4,
       textAlign: 'center',
@@ -268,71 +415,31 @@ export default function DashboardScreen() {
       color: theme.colors.textSecondary,
       textAlign: 'center',
     },
-    chartContainer: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: 12,
-      padding: 20,
-      shadowColor: theme.colors.text,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 3,
-    },
-    chartHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    chartTitle: {
-      fontSize: 18,
-      fontFamily: 'Inter-SemiBold',
-      color: theme.colors.text,
-    },
-    timeRangeSelector: {
-      flexDirection: 'row',
-      backgroundColor: theme.colors.background,
-      borderRadius: 8,
-      padding: 2,
-    },
-    timeRangeButton: {
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 6,
-    },
-    timeRangeButtonActive: {
-      backgroundColor: theme.colors.primary,
-    },
-    timeRangeText: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      fontFamily: 'Inter-Medium',
-    },
-    timeRangeTextActive: {
-      color: '#FFFFFF',
-    },
     analysesContainer: {
       gap: 12,
     },
     analysisCard: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: 12,
+      borderRadius: 16,
       padding: 16,
       flexDirection: 'row',
       alignItems: 'center',
       shadowColor: theme.colors.text,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 4,
-      elevation: 2,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      elevation: 5,
+    },
+    analysisIcon: {
+      padding: 12,
+      borderRadius: 12,
+      marginRight: 16,
     },
     analysisInfo: {
       flex: 1,
-      marginLeft: 12,
     },
     patientName: {
       fontSize: 16,
-      fontFamily: 'Inter-SemiBold',
+      fontFamily: 'Inter-Bold',
       color: theme.colors.text,
       marginBottom: 4,
     },
@@ -348,11 +455,10 @@ export default function DashboardScreen() {
     },
     severity: {
       fontSize: 12,
-      fontFamily: 'Inter-Medium',
+      fontFamily: 'Inter-SemiBold',
       paddingHorizontal: 8,
       paddingVertical: 2,
       borderRadius: 10,
-      backgroundColor: theme.colors.warning,
       color: '#FFFFFF',
     },
     analysisDate: {
@@ -372,56 +478,114 @@ export default function DashboardScreen() {
       fontSize: 10,
       color: theme.colors.textSecondary,
     },
+    systemStatusContainer: {
+      gap: 12,
+    },
+    statusItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      borderRadius: 12,
+      backgroundColor: theme.colors.surface,
+    },
+    statusIcon: {
+      marginRight: 12,
+    },
+    statusInfo: {
+      flex: 1,
+    },
+    statusName: {
+      fontSize: 16,
+      fontFamily: 'Inter-SemiBold',
+      color: theme.colors.text,
+      marginBottom: 2,
+    },
+    statusValue: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+    statusIndicator: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+    },
+    eyeModelContainer: {
+      alignItems: 'center',
+      padding: 20,
+    },
+    modelTitle: {
+      fontSize: 18,
+      fontFamily: 'Inter-Bold',
+      color: theme.colors.text,
+      marginBottom: 16,
+    },
+    fab: {
+      position: 'absolute',
+      bottom: 24,
+      right: 24,
+    },
   });
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <Text style={styles.title}>Dashboard</Text>
-          <Text style={styles.dateTime}>
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+        <LinearGradient
+          colors={[theme.colors.primary, theme.colors.secondary, '#8B5CF6']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerGradient}
+        />
+        <Animated.View style={[styles.headerContent, slideAnimatedStyle]}>
+          <View style={styles.headerTop}>
+            <Text style={styles.title}>AI Dashboard</Text>
+            <Text style={styles.dateTime}>
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </Text>
+          </View>
+          <Text style={styles.welcome}>
+            Welcome back, Dr. {user?.lastName || 'Doctor'}
           </Text>
-        </View>
-        <Text style={styles.welcome}>
-          Welcome back, Dr. {user?.lastName || 'Doctor'}
-        </Text>
-        <Text style={styles.subtitle}>
-          Here's what's happening with your patients today
-        </Text>
+          <Text style={styles.subtitle}>
+            Advanced AI-powered medical diagnostics at your fingertips
+          </Text>
+        </Animated.View>
       </View>
 
       <View style={styles.content}>
-        {/* Statistics */}
-        <View style={styles.section}>
+        {/* Key Metrics */}
+        <Animated.View style={[styles.section, slideAnimatedStyle]}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Overview</Text>
+            <Text style={styles.sectionTitle}>AI Performance</Text>
           </View>
           <View style={styles.statsGrid}>
             {stats.map((stat, index) => (
-              <View key={index} style={styles.statCard}>
-                <View style={styles.statHeader}>
-                  <View style={styles.statIcon}>
-                    <stat.icon size={20} color={theme.colors.primary} />
+              <Animated.View key={index} style={[styles.statCard, pulseAnimatedStyle]}>
+                <LinearGradient
+                  colors={[stat.color, `${stat.color}CC`]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.statGradient}
+                />
+                <View style={styles.statContent}>
+                  <View style={styles.statHeader}>
+                    <View style={styles.statIcon}>
+                      <stat.icon size={24} color="#FFFFFF" />
+                    </View>
                   </View>
+                  <Text style={styles.statValue}>{stat.value}</Text>
+                  <Text style={styles.statTitle}>{stat.title}</Text>
+                  <Text style={styles.statChange}>
+                    {stat.change} from last week
+                  </Text>
                 </View>
-                <Text style={styles.statValue}>{stat.value}</Text>
-                <Text style={styles.statTitle}>{stat.title}</Text>
-                <Text style={[
-                  styles.statChange,
-                  stat.changeType === 'positive' ? styles.positiveChange : styles.negativeChange
-                ]}>
-                  {stat.change} from last month
-                </Text>
-              </View>
+              </Animated.View>
             ))}
           </View>
-        </View>
+        </Animated.View>
 
         {/* Quick Actions */}
         <View style={styles.section}>
@@ -435,54 +599,36 @@ export default function DashboardScreen() {
                 style={styles.actionCard}
                 onPress={action.onPress}
               >
-                <View style={styles.actionIcon}>
-                  <action.icon size={32} color={action.color} />
-                </View>
-                <Text style={styles.actionTitle}>{action.title}</Text>
-                <Text style={styles.actionDescription}>{action.description}</Text>
+                <NeumorphicCard style={{ padding: 0, backgroundColor: 'transparent' }}>
+                  <View style={styles.actionIcon}>
+                    <action.icon size={32} color={action.color} />
+                  </View>
+                  <Text style={styles.actionTitle}>{action.title}</Text>
+                  <Text style={styles.actionDescription}>{action.description}</Text>
+                </NeumorphicCard>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {/* Analysis Chart */}
-        <View style={styles.section}>
-          <View style={styles.chartContainer}>
-            <View style={styles.chartHeader}>
-              <Text style={styles.chartTitle}>Analysis Activity</Text>
-              <View style={styles.timeRangeSelector}>
-                {['week', 'month', 'year'].map((range) => (
-                  <TouchableOpacity
-                    key={range}
-                    style={[
-                      styles.timeRangeButton,
-                      timeRange === range && styles.timeRangeButtonActive,
-                    ]}
-                    onPress={() => setTimeRange(range)}
-                  >
-                    <Text style={[
-                      styles.timeRangeText,
-                      timeRange === range && styles.timeRangeTextActive,
-                    ]}>
-                      {range.charAt(0).toUpperCase() + range.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-            <View style={{ height: 200, justifyContent: 'center', alignItems: 'center' }}>
-              <BarChart3 size={48} color={theme.colors.textSecondary} />
-              <Text style={{ color: theme.colors.textSecondary, marginTop: 8 }}>
-                Chart visualization would appear here
-              </Text>
-            </View>
+        {/* 3D Eye Model Showcase */}
+        <GlassCard style={styles.section}>
+          <View style={styles.eyeModelContainer}>
+            <Text style={styles.modelTitle}>3D Eye Visualization</Text>
+            <Animated.View style={rotateAnimatedStyle}>
+              <EyeModel3D 
+                condition="normal"
+                animated={true}
+                size={200}
+              />
+            </Animated.View>
           </View>
-        </View>
+        </GlassCard>
 
-        {/* Recent Analyses */}
+        {/* Recent AI Analyses */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Analyses</Text>
+            <Text style={styles.sectionTitle}>Recent AI Analyses</Text>
             <TouchableOpacity style={styles.viewAllButton}>
               <Text style={styles.viewAllText}>View All</Text>
               <TrendingUp size={16} color={theme.colors.primary} />
@@ -490,15 +636,23 @@ export default function DashboardScreen() {
           </View>
           <View style={styles.analysesContainer}>
             {recentAnalyses.map((analysis) => (
-              <View key={analysis.id} style={styles.analysisCard}>
-                <Eye size={24} color={theme.colors.primary} />
+              <GlassCard key={analysis.id} style={styles.analysisCard}>
+                <View style={[
+                  styles.analysisIcon,
+                  { backgroundColor: getRiskColor(analysis.riskLevel) + '20' }
+                ]}>
+                  <Brain size={24} color={getRiskColor(analysis.riskLevel)} />
+                </View>
                 <View style={styles.analysisInfo}>
                   <Text style={styles.patientName}>{analysis.patientName}</Text>
                   <View style={styles.conditionInfo}>
                     <Text style={styles.condition}>{analysis.condition}</Text>
-                    {analysis.severity !== 'N/A' && (
-                      <Text style={styles.severity}>{analysis.severity}</Text>
-                    )}
+                    <Text style={[
+                      styles.severity,
+                      { backgroundColor: getRiskColor(analysis.riskLevel) }
+                    ]}>
+                      {analysis.severity}
+                    </Text>
                   </View>
                   <Text style={styles.analysisDate}>{analysis.date}</Text>
                 </View>
@@ -506,11 +660,45 @@ export default function DashboardScreen() {
                   <Text style={styles.confidence}>{analysis.confidence}%</Text>
                   <Text style={styles.confidenceLabel}>Confidence</Text>
                 </View>
-              </View>
+              </GlassCard>
+            ))}
+          </View>
+        </View>
+
+        {/* System Status */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>System Status</Text>
+          </View>
+          <View style={styles.systemStatusContainer}>
+            {systemStatus.map((status, index) => (
+              <NeumorphicCard key={index} style={styles.statusItem}>
+                <status.icon 
+                  size={20} 
+                  color={getStatusColor(status.status)} 
+                  style={styles.statusIcon}
+                />
+                <View style={styles.statusInfo}>
+                  <Text style={styles.statusName}>{status.name}</Text>
+                  <Text style={styles.statusValue}>{status.value}</Text>
+                </View>
+                <View style={[
+                  styles.statusIndicator,
+                  { backgroundColor: getStatusColor(status.status) }
+                ]} />
+              </NeumorphicCard>
             ))}
           </View>
         </View>
       </View>
+
+      <FloatingActionButton
+        onPress={() => router.push('/(dashboard)/ai-diagnostics')}
+        style={styles.fab}
+        color="#8B5CF6"
+      >
+        <Brain size={24} color="#FFFFFF" />
+      </FloatingActionButton>
     </ScrollView>
   );
 }
