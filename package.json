@@ -74,11 +74,4 @@
     "jest": "^29.7.0",
     "typescript": "~5.8.3"
   }
-}// package.json (excerpt)
-"dependencies": {
-  // ... other dependencies
-  "@expo-google-fonts/inter": "^x.x.x", // Make sure this is present and up-to-date
-  "@expo-google-fonts/roboto": "^x.x.x", // This is the one you need to ensure is there
-  "@expo-google-fonts/source-sans-pro": "^x.x.x", // And this one
-  // ...
 }
