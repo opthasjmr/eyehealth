@@ -16,28 +16,7 @@ import Animated, {
   withSequence,
   interpolate,
 } from 'react-native-reanimated';
-import { 
-  LayoutDashboard, 
-  Upload, 
-  Users, 
-  FileText, 
-  TrendingUp, 
-  Eye, 
-  Brain, 
-  Activity, 
-  Calendar, 
-  Cpu,
-  Zap,
-  Shield,
-  Target,
-  CheckCircle,
-  AlertTriangle,
-  Clock,
-  Database,
-  Microscope,
-  BarChart3,
-  PieChart,
-} from 'lucide-react-native';
+import { LayoutDashboard, Upload, Users, FileText, TrendingUp, Eye, Brain, Activity, Calendar, Cpu, Zap, Shield, Target, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Clock, Database, Microscope, ChartBar as BarChart3, ChartPie as PieChart } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePatients } from '@/contexts/PatientContext';
