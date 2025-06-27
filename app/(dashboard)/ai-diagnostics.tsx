@@ -20,27 +20,7 @@ import Animated, {
   withSequence,
   interpolate,
 } from 'react-native-reanimated';
-import {
-  Brain,
-  Upload,
-  Camera,
-  FileImage,
-  Scan,
-  Eye,
-  Activity,
-  TrendingUp,
-  Download,
-  Share,
-  RotateCcw,
-  Zap,
-  Target,
-  CheckCircle,
-  AlertTriangle,
-  Clock,
-  Cpu,
-  Database,
-  Microscope,
-} from 'lucide-react-native';
+import { Brain, Upload, Camera, FileImage, Scan, Eye, Activity, TrendingUp, Download, Share, RotateCcw, Zap, Target, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Clock, Cpu, Database, Microscope } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAI } from '@/contexts/AIContext';
 import { usePatients } from '@/contexts/PatientContext';
